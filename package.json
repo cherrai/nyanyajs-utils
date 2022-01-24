@@ -1,0 +1,27 @@
+{
+	"name": "@nyanyajs/utils",
+	"version": "1.0.0",
+	"description": "nyanyajs/utils",
+	"main": "./dist/index.js",
+	"scripts": {
+		"build": "tsc"
+	},
+	"author": "shiina_aiiko",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ShiinaAiiko/nyanyajs-utils.git"
+	},
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/ShiinaAiiko/nyanyajs-utils/issues"
+	},
+	"homepage": "https://github.com/ShiinaAiiko/nyanyajs-utils#readme",
+	"dependencies": {
+		"blueimp-md5": "^2.19.0",
+		"ua-parser-js": "^1.0.2"
+	},
+	"devDependencies": {
+		"@types/blueimp-md5": "^2.18.0",
+		"@types/ua-parser-js": "^0.7.36"
+	}
+}
