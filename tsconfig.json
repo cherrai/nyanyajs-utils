@@ -1,10 +1,12 @@
 {
 	"compilerOptions": {
-		"target": "ES2015",
+		"target": "es2015",
 		"lib": ["es2015", "dom", "ES2020"],
 		"module": "commonjs",
 		"experimentalDecorators": true,
-		"outDir": "../../MetahorizonLab/MeowWhisper/web-client/node_modules/@nyanyajs/utils/dist",
+    
+		// "outDir": "../../MetahorizonLab/MeowWhisper/web-client/node_modules/@nyanyajs/utils/dist",
+		"outDir": "../../MetahorizonLab/SSO/client/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "./examples/react/node_modules/@nyanyajs/nyanyadb",
 		// "outDir": "./examples/demo/src/nyanyadb",
 		// "outFile": "./examples/demo/src/nyanyadb.js",

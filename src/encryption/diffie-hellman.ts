@@ -1,5 +1,5 @@
 import { random, getRandomNum } from './commmon'
-const BigNumber = require('big-number')
+import BigNumber from 'big-number'
 
 BigNumber.prototype.clean = function () {
 	// used to make the value of BigNumber()'s more eye friendly
