@@ -1,18 +1,32 @@
 import { KEYUTIL, KJUR, b64tohex, hextob64 } from 'jsrsasign'
+import CryptoJS from 'crypto-js'
 
 export const getRsaKey = () => {
-	const rsaKeypair = KEYUTIL.generateKeypair('RSA', 2048)
-	const privateKey = KEYUTIL.getPEM(rsaKeypair.prvKeyObj, 'PKCS8PRV')
-	const publicKey = KEYUTIL.getPEM(rsaKeypair.pubKeyObj)
+	return new Promise<{
+		privateKey: string
+		publicKey: string
+	}>((resolve, reject) => {
+		try {
+			const rsaKeypair = KEYUTIL.generateKeypair('RSA', 2048)
+			const privateKey = KEYUTIL.getPEM(rsaKeypair.prvKeyObj, 'PKCS8PRV')
+			const publicKey = KEYUTIL.getPEM(rsaKeypair.pubKeyObj)
 
-	return {
-		privateKey,
-		publicKey,
-	}
+			resolve({
+				privateKey,
+				publicKey,
+			})
+		} catch (error) {
+			reject(error)
+		}
+	})
 }
-export const getSign = (privatekey: string, str: string) => {
+export const getSign = (
+	privatekey: string,
+	str: string,
+	alg: string = 'SHA256withRSA'
+) => {
 	const rsa = KEYUTIL.getKey(privatekey)
-	const sig = new KJUR.crypto.Signature({ alg: 'SHA256withRSA' })
+	const sig = new KJUR.crypto.Signature({ alg: alg })
 	sig.init(rsa)
 	sig.updateString(str)
 	// var sign = hextob64(sig.sign())
@@ -31,9 +45,15 @@ export const decrypt = (priK: string, enc: string) => {
 	const value = decryptFunc(enc, prv)
 	return value
 }
-export const verifySign = (data: string, publicKey: string, sign: string) => {
+
+export const verifySign = (
+	data: string,
+	publicKey: string,
+	sign: string,
+	alg: string = 'SHA256withRSA'
+) => {
 	const sig2 = new KJUR.crypto.Signature({
-		alg: 'SHA256withRSA',
+		alg: alg,
 	})
 	sig2.init(publicKey)
 	sig2.updateString(data)

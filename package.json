@@ -1,9 +1,10 @@
 {
 	"name": "@nyanyajs/utils",
-	"version": "1.0.0",
+	"version": "1.0.4",
 	"description": "nyanyajs/utils",
 	"main": "./dist/index.js",
 	"scripts": {
+		"test:watch": "nodemon -e ts,tsx --exec ts-node ./test/index.ts",
 		"build": "tsc"
 	},
 	"author": "shiina_aiiko",
@@ -17,14 +18,21 @@
 	},
 	"homepage": "https://github.com/ShiinaAiiko/nyanyajs-utils#readme",
 	"dependencies": {
+		"@nyanyajs/nyanyadb": "^1.0.2",
+		"axios": "^0.27.2",
 		"big-number": "^2.0.0",
 		"blueimp-md5": "^2.19.0",
 		"crypto-js": "^4.1.1",
+		"dhkea-js": "^1.0.0",
+		"ion-sdk-js": "^1.8.2",
 		"jsrsasign": "^10.5.1",
+		"nyanyajs-log": "^1.0.10",
 		"ua-parser-js": "^1.0.2"
 	},
 	"devDependencies": {
 		"@types/blueimp-md5": "^2.18.0",
+		"@types/crypto-js": "^4.0.2",
+		"@types/jsrsasign": "^8.0.13",
 		"@types/ua-parser-js": "^0.7.36"
 	}
 }

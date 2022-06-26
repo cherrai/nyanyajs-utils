@@ -1,3 +1,4 @@
+// 时间队列
 export class QueueLoop {
 	global: boolean = false
 	delayms: number = 1000
@@ -26,7 +27,7 @@ export class QueueLoop {
 						if (!item.options.currentCount) {
 							item.options.currentCount = 1
 						}
-						if (item.options.currentCount === item.options.count) {
+						if (item.options.currentCount >= item.options.count) {
 							this.decrease(item.key)
 							return
 						}

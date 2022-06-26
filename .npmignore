@@ -1,5 +1,7 @@
 src/
 examples/
+test/
 tsconfig.json
 .gitignore
 .npmignore
+tmp/

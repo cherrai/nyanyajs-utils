@@ -1,5 +1,4 @@
 import md5 from 'blueimp-md5'
-import { AES } from './encryption'
 
 // export type Storage = {
 // 	NyaNyaDB?: {
@@ -18,6 +17,11 @@ export type OnChangeHandlerType<K, T> = ({}: {
 	value: T | null
 	type: 'Set' | 'Delete'
 }) => void
+export type OnHandlerType<K, T> = ({}: {
+	key: K
+	value: T | null
+	type: 'Get' | 'Set' | 'Delete'
+}) => void
 export class LocalCache<K = string, T = any> {
 	mapCache: Map<string, T>
 	persistence: boolean
@@ -27,6 +31,7 @@ export class LocalCache<K = string, T = any> {
 	platform: 'Electron' | 'Web'
 	private mustGetHandlers?: (k: K) => Promise<T>
 	private onChangeHandlers: OnChangeHandlerType<K, T>[] = []
+	private onHandlers: OnHandlerType<K, T>[] = []
 	private initHandlers: InitHandlerType<K, T>[] = []
 
 	constructor(options: {
@@ -36,6 +41,7 @@ export class LocalCache<K = string, T = any> {
 		platform: 'Electron' | 'Web'
 
 		OnChange?: OnChangeHandlerType<K, T>
+		OnHandler?: OnHandlerType<K, T>
 		Init?: InitHandlerType<K, T>
 		MustGet?: (k: K) => Promise<T>
 	}) {
@@ -47,6 +53,7 @@ export class LocalCache<K = string, T = any> {
 		this.mapCache = new Map()
 		options?.Init && this.initHandlers.push(options.Init)
 		options?.OnChange && this.onChangeHandlers.push(options.OnChange)
+		options?.OnHandler && this.onHandlers.push(options.OnHandler)
 		this.init()
 	}
 	init() {
@@ -91,6 +98,10 @@ export class LocalCache<K = string, T = any> {
 		callback: ({}: { key: K; value: T | null; type: 'Set' | 'Delete' }) => void
 	) {
 		this.onChangeHandlers.push(callback)
+	}
+
+	OnHandler(callback: OnHandlerType<K, T>) {
+		this.onHandlers.push(callback)
 	}
 
 	getKey<T = K>(k: T) {
@@ -139,14 +150,25 @@ export class LocalCache<K = string, T = any> {
 				type: 'Set',
 			})
 		})
+		this.onHandlers.forEach((func) => {
+			func({
+				key: k,
+				value: v,
+				type: 'Set',
+			})
+		})
 	}
-	Get(k: K) {
+	Get(k: K): T {
 		const value = this.mapCache.get(this.getKey(k))
-		if (value) {
-			return value
-		} else {
-			return {}
-		}
+
+		this.onHandlers.forEach((func) => {
+			func({
+				key: k,
+				value: value,
+				type: 'Get',
+			})
+		})
+		return value
 	}
 	GetIndex(k: K): number {
 		let index = -1
@@ -184,6 +206,13 @@ export class LocalCache<K = string, T = any> {
 		const isDelete = this.mapCache.delete(this.getKey(k))
 		this.updateCache()
 		this.onChangeHandlers.forEach((func) => {
+			func({
+				key: k,
+				value: null,
+				type: 'Delete',
+			})
+		})
+		this.onHandlers.forEach((func) => {
 			func({
 				key: k,
 				value: null,
