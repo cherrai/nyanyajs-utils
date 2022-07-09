@@ -2,8 +2,9 @@ import { Debounce } from './debounce'
 import { LocalCache } from './localCache'
 import { userAgent } from './userAgent'
 import WebStorage from './webStorage'
+import { NodeFsStorage } from './webStorage/node'
 import { QueueLoop } from './queueloop'
-import { RunQueue} from './runQueue'
+import { RunQueue } from './runQueue'
 import { SFUClient, SFUSignal, SFUStream } from './ionSfuSdk'
 import {
 	CipherSignature,
@@ -34,6 +35,7 @@ export {
 	SAaSS,
 	deepCopy,
 	RunQueue,
+	NodeFsStorage,
 }
 
 export default {
@@ -54,4 +56,5 @@ export default {
 	SAaSS,
 	deepCopy,
 	RunQueue,
+	NodeFsStorage,
 }

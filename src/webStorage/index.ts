@@ -1,7 +1,7 @@
 import { NyaNyaDB, IndexedDB } from '@nyanyajs/nyanyadb'
 import { RunQueue } from '../runQueue'
 export interface StorageOptions {
-	storage?: 'LocalStorage' | 'IndexedDB'
+	storage?: 'LocalStorage' | 'IndexedDB' | 'NodeFS'
 	baseLabel: string
 	encryption?: {
 		enable: boolean
@@ -410,7 +410,6 @@ export class WebStorage<K = string, T = any> {
 	}
 	// expiration(s)
 	public set(key: K, value: T, expiration?: number) {
-		// console.log(key, value)
 		return new Promise<boolean>(async (resolve, reject) => {
 			try {
 				if (!key) return resolve(false)
