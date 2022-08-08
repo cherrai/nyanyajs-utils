@@ -4,11 +4,13 @@ const deco = (v: any, count: number, maximumDepth: number) => {
 	}
 	if (typeof v === 'object') {
 		if (!v) return v
-		if (v instanceof Array) {
-			let obj = v.map((sv) => {
-				return deco(sv, count + 1, maximumDepth)
-			})
-			return obj
+		if (v?.length != undefined) {
+			if (v instanceof Array) {
+				let obj = v.map((sv) => {
+					return deco(sv, count + 1, maximumDepth)
+				})
+				return obj
+			}
 		}
 		let obj = {}
 		Object.keys(v).forEach((k) => {
@@ -16,8 +18,26 @@ const deco = (v: any, count: number, maximumDepth: number) => {
 		})
 		return obj
 	}
+	switch (typeof v) {
+		case 'string':
+			v = v.toString()
+			break
+		case 'number':
+			v = Number(v)
+			break
+      case 'boolean':
+        v = !!v
+        break
+
+		default:
+			break
+	}
 	return v
 }
-export const deepCopy = (v: any, maximumDepth: number = 5) => {
-	return deco(v, 0, maximumDepth)
+export const deepCopy = (v: any, maximumDepth: number = 10) => {
+	try {
+		return deco(v, 0, maximumDepth)
+	} catch (error) {
+		return JSON.parse(JSON.stringify(v))
+	}
 }

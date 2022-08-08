@@ -15,9 +15,19 @@ export interface UserAgent {
 		version: string
 	}
 	deviceName: string
+	// appName?: string
+	// SSO App服务名
+	services?: string
 }
 
-export const userAgent = (ua: string): UserAgent => {
+export const userAgent = (
+	ua: string,
+	options?: {
+		appName?: string
+		// SSO App服务名
+		services?: string
+	}
+): UserAgent => {
 	const userAgent = parserFunc(ua)
 	let deviceType = ''
 	// electron env
@@ -44,7 +54,8 @@ export const userAgent = (ua: string): UserAgent => {
 		},
 		deviceName:
 			userAgent.device.vendor + userAgent.device.model
-				? userAgent.device.vendor + ' ' + userAgent.device.model
+				? (userAgent.device.vendor ? userAgent.device.vendor + ' ' : '') +
+				  userAgent.device.model
 				: userAgent.browser.name || userAgent.os.name,
 	}
 }

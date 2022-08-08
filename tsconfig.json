@@ -9,10 +9,10 @@
 		// "outDir": "../../MetahorizonLab/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
 		// windows11
     // "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
-    "outDir": "../../meow-sticky-note/client/node_modules/@nyanyajs/utils/dist",
-    // "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
-    // "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../meow-sticky-note/client/node_modules/@nyanyajs/utils/dist",
     // "outDir": "../../saki-ui/saki-ui/node_modules/@nyanyajs/utils/dist",
+    "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
 
     // "outDir": "../../MetahorizonLab/saki-ui/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../MetahorizonLab/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
