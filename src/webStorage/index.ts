@@ -208,7 +208,10 @@ export class WebStorage<K = string, T = any> {
 		}) {
 			return new Promise<any>((resolve, reject) => {
 				try {
-					if (typeof window === 'undefined' || !window?.require) {
+					if (typeof window === 'undefined') {
+						return
+					}
+					if (!window?.require) {
 						reject('Non-electron environment')
 						return
 					}
@@ -234,10 +237,13 @@ export class WebStorage<K = string, T = any> {
 	}
 	static electronNodeFsStorageStatus = false
 	static electronNodeFsStorageInit() {
-		if (typeof window === 'undefined' || !window?.require) return
+    if (typeof window === 'undefined') {
+      return
+    }
+		if (!window?.require) return
 
 		if (WebStorage.electronNodeFsStorageStatus) return
-		console.log(window)
+		// console.log(window)
 		const electron = window?.require?.('electron')
 
 		if (!electron) {
@@ -353,7 +359,7 @@ export class WebStorage<K = string, T = any> {
 									resolve(this.undefinedValue())
 									return
 								}
-								const vObj: Value<T> = JSON.parse(v[0].data)
+								const vObj: Value<T> = JSON.parse(v[v.length - 1].data)
 								// const options = JSON.parse(v[0].options).v
 								if (!vObj) {
 									return this.undefinedValue()
@@ -386,6 +392,7 @@ export class WebStorage<K = string, T = any> {
 							key: String(key),
 							label: this.label,
 						})
+						this.map[String(key)] = v
 						resolve(v)
 						break
 
@@ -443,6 +450,10 @@ export class WebStorage<K = string, T = any> {
 								label: this.label,
 							})
 							.then()
+
+						res?.forEach((v: any) => {
+							this.map[String(v.key)] = v.value
+						})
 						resolve(res || [])
 						break
 					default:
@@ -585,6 +596,7 @@ export class WebStorage<K = string, T = any> {
 							value: value,
 							expiration,
 						})
+						this.map[String(key)] = v
 						resolve(v)
 						break
 					case 'LocalStorage':
@@ -594,6 +606,7 @@ export class WebStorage<K = string, T = any> {
 						const k = this.getKey(key)
 						const getValue = await this.get(key)
 						const vObj = this.getValue(value, expiration * 1000)
+						// console.log('vObj', k, vObj,getValue)
 						if (typeof key === 'string') {
 						}
 						if (!getValue) {
@@ -742,6 +755,7 @@ export class WebStorage<K = string, T = any> {
 					key: String(key),
 					label: this.label,
 				})
+				delete this.map[String(key)]
 				break
 			// throw 'IndexedDB does not support synchronous functions'
 
@@ -797,7 +811,12 @@ export class WebStorage<K = string, T = any> {
 						type: 'deleteAll',
 						label: this.label,
 					})
-					.then()
+					.then((v: any) => {
+						this.map = {}
+					})
+					.catch((err: any) => {
+						throw err
+					})
 				break
 			// throw 'IndexedDB does not support synchronous functions'
 

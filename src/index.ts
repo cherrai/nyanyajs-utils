@@ -5,7 +5,10 @@ import WebStorage from './webStorage'
 // import { NodeFsStorage } from './webStorage/node'
 import { QueueLoop } from './queueloop'
 import { RunQueue } from './runQueue'
+import { NSocketIoClient } from './nsocketio'
 import { request } from './request'
+import { images } from './images'
+import { file } from './file'
 // import { SFUClient, SFUSignal, SFUStream } from './ionSfuSdk'
 import {
 	CipherSignature,
@@ -39,6 +42,9 @@ export {
 	RunQueue,
 	request,
 	SakiSSOClient,
+	images,
+	NSocketIoClient,
+	file,
 	// NodeFsStorage,
 }
 
@@ -62,5 +68,8 @@ export default {
 	RunQueue,
 	request,
 	SakiSSOClient,
+	images,
+	NSocketIoClient,
+	file,
 	// NodeFsStorage,
 }
