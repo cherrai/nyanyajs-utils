@@ -20,7 +20,7 @@ import {
 } from './cipher'
 import SAaSS from './saass'
 import { SakiSSOClient } from './sakisso'
-import { deepCopy } from './common/common'
+import { deepCopy, NetworkStatus } from './common/common'
 
 export {
 	Debounce,
@@ -45,6 +45,7 @@ export {
 	images,
 	NSocketIoClient,
 	file,
+	// NetworkStatus,
 	// NodeFsStorage,
 }
 
@@ -71,5 +72,6 @@ export default {
 	images,
 	NSocketIoClient,
 	file,
+	// NetworkStatus,
 	// NodeFsStorage,
 }

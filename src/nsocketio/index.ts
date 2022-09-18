@@ -35,16 +35,18 @@ export type RouterGroupApi = {
 	}) => RouterGroupApi
 }
 
-export class NSocketIoClient {
+export class NSocketIoClient extends EventTarget {
 	manager: SocketIOClient.Manager | undefined
 	uri: string
 	opts: SocketIOClient.ConnectOpts | undefined
 	namespace: {
 		[namespace: string]: SocketIOClient.Socket
 	} = {}
-	private heartbeatInterval = 60 * 1000
+	private heartbeatInterval = 10 * 1000
 	eventNameRouter: any = {}
+	private pingTimer?: NodeJS.Timer
 	constructor(uri: string, opts?: SocketIOClient.ConnectOpts) {
+		super()
 		this.uri = uri
 		this.opts = opts || {}
 
@@ -80,6 +82,7 @@ export class NSocketIoClient {
 		this.ping(namespace)
 	}
 	private ping(namespace: string) {
+		clearTimeout(this.pingTimer)
 		// this.namespace[namespace].on('ping1314', (res:any) => {
 		// 	console.log(res)
 		// })
@@ -97,25 +100,26 @@ export class NSocketIoClient {
 			const res = await this.emit({
 				namespace: namespace,
 				eventName: 'ping1314',
-				params: {
-					a: '1',
-				},
+				params: {},
 				options: {
-					timeout: 5000,
+					timeout: 1000,
 				},
 			})
 			if (res?.data?.code === 200) {
+				this.dispatchEvent(new Event('connected'))
 			} else {
-				console.log('ping1314', res, res?.data?.code === 200)
+				this.dispatchEvent(new Event('disconnect'))
+				// console.log('ping1314', res, res?.data?.code === 200)
 				connect()
 			}
 		}
 		send()
-		setInterval(() => {
+		this.pingTimer = setInterval(() => {
 			send()
 		}, this.heartbeatInterval)
 	}
 	close() {
+		clearTimeout(this.pingTimer)
 		Object.keys(this.namespace).forEach((namespace) => {
 			this.namespace[namespace].disconnect()
 		})

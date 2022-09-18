@@ -1,6 +1,6 @@
 {
 	"name": "@nyanyajs/utils",
-	"version": "1.0.12",
+	"version": "1.0.13",
 	"description": "nyanyajs/utils",
 	"main": "./dist/index.js",
 	"scripts": {

@@ -25,9 +25,9 @@ const deco = (v: any, count: number, maximumDepth: number) => {
 		case 'number':
 			v = Number(v)
 			break
-      case 'boolean':
-        v = !!v
-        break
+		case 'boolean':
+			v = !!v
+			break
 
 		default:
 			break
@@ -39,5 +39,11 @@ export const deepCopy = (v: any, maximumDepth: number = 10) => {
 		return deco(v, 0, maximumDepth)
 	} catch (error) {
 		return JSON.parse(JSON.stringify(v))
+	}
+}
+
+export class NetworkStatus extends EventTarget {
+	constructor() {
+		super()
 	}
 }
