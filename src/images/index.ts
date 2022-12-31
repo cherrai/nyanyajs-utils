@@ -6,6 +6,15 @@ type ExifType = {
 	ImageWidth: number
 	Model: string
 }
+type ResizeOption = {
+	// 如果宽度或者高度其中一个为不存在，则按照另外一个的像素等比例缩放
+	// 如果都填写了，则按照新的像素拉伸缩放
+	maxPixel?: number
+	width?: number
+	height?: number
+	quality: number
+	exif?: ExifType
+}
 export const getExif = (file: File) => {
 	return new Promise<ExifType>(function (resolve, reject) {
 		// const fileReader = new FileReader()
@@ -34,18 +43,7 @@ export const getExif = (file: File) => {
 		// fileReader.readAsDataURL(file)
 	})
 }
-export const resize = async (
-	file: File,
-	options: {
-		// 如果宽度或者高度其中一个为不存在，则按照另外一个的像素等比例缩放
-		// 如果都填写了，则按照新的像素拉伸缩放
-		maxPixel?: number
-		width?: number
-		height?: number
-		quality: number
-		exif?: ExifType
-	}
-) => {
+export const resize = async (file: File, options: ResizeOption) => {
 	if (options.maxPixel) {
 		// console.log(file, options)
 		if (!file) {
@@ -221,7 +219,41 @@ export const convert = (
 	})
 }
 
+const getFileByBase64 = (base64URL: string, filename: string) => {
+	let arr: any = base64URL.split(','),
+		mime = arr[0].match(/:(.*?);/)[1],
+		bstr = atob(arr[1]),
+		n = bstr.length,
+		u8arr = new Uint8Array(n)
+	while (n--) {
+		u8arr[n] = bstr.charCodeAt(n)
+	}
+	return new File([u8arr], filename, { type: mime })
+}
+
+const getBase64ByUrl = (url: string) => {
+	return new Promise<string>((res) => {
+		let cvs = document.createElement('canvas')
+		let ctx = cvs.getContext('2d')
+		let img = new Image()
+		img.crossOrigin = 'Anonymous'
+		img.onload = () => {
+			if (!ctx) return
+			cvs.height = img.height
+			cvs.width = img.width
+			ctx.drawImage(img, 0, 0)
+			res(cvs.toDataURL('image/png', 1))
+		}
+		img.src = url
+	})
+}
+
+export const resizeByUrl = async (src: string, options: ResizeOption) => {
+	return resize(getFileByBase64(await getBase64ByUrl(src), 'a.jpg'), options)
+}
+
 export const images = {
 	getExif,
 	resize,
+	resizeByUrl,
 }

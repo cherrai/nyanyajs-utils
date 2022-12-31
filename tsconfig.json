@@ -5,22 +5,23 @@
 		"module": "commonjs",
 		"experimentalDecorators": true,
 
-    // macos
+		// macos
 		// "outDir": "../../MetahorizonLab/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
 		// windows11
-    // "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
-    "outDir": "../../meow-sticky-note/meow-sticky-note-client/node_modules/@nyanyajs/utils/dist",
-    // "outDir": "../../saki-ui/saki-ui/node_modules/@nyanyajs/utils/dist",
-    // "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
-    // "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../meow-sticky-note/meow-sticky-note-client/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../nyanya/nyanya-toolbox/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../saki-ui/saki-ui/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
 
-    // "outDir": "../../MetahorizonLab/saki-ui/node_modules/@nyanyajs/utils/dist",
+		// "outDir": "../../MetahorizonLab/saki-ui/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../MetahorizonLab/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../MetahorizonLab/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "./examples/react/node_modules/@nyanyajs/nyanyadb",
 		// "outDir": "./examples/demo/src/nyanyadb",
 		// "outFile": "./examples/demo/src/nyanyadb.js",
-		// "outDir": "./dist",
+		"outDir": "./dist",
 		"rootDir": "./src",
 		"allowJs": false,
 		"declaration": true,
