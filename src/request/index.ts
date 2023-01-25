@@ -8,6 +8,8 @@ import axios, {
 	ResponseType,
 } from 'axios'
 import qs from 'qs'
+import Long from 'long'
+import { Buffer } from 'buffer'
 // let userInfo = root.lookupType('Person')
 // let infoData = { Name: 'xiaoming', Id: 24 }
 // // 将js对象序列化成二进制
@@ -167,4 +169,59 @@ export const interceptors = {
 	response: new ResponseInterceptorManager(),
 }
 
+export const protobuf = {
+	ParamsEncode: <T = any>(data: T, proto: T | any) => {
+		try {
+			return {
+				data: Buffer.from(
+					proto.encode(proto.create(data)).finish(),
+					'base64'
+				).toString('base64'),
+			}
+		} catch (error) {
+			throw error
+		}
+	},
+
+	ResponseDecode: <T = any>(
+		response: Response,
+		proto: T | any
+	): ResponseData<T> => {
+		try {
+			if (
+				// response.headers['content-type'] === 'application/x-protobuf' &&
+				typeof response.data?.data === 'string'
+			) {
+				response.data.data = proto.decode(
+					new Uint8Array(Buffer.from(response.data.data, 'base64'))
+				)
+			}
+			response.data = protobuf.FoeEachLongToNumber(response.data)
+
+			return response.data
+		} catch (error) {
+			throw error
+		}
+	},
+	LongToNumber: (data: any): number => {
+		if (data?.hasOwnProperty('low') && typeof data?.low === 'number') {
+			const long = new Long(data.low, data.high, data.unsigned)
+
+			return long.toNumber()
+		}
+		return data
+	},
+	FoeEachLongToNumber: (data: any) => {
+		Object.keys(data).forEach((k) => {
+			if (typeof data[k] === 'object') {
+				if (data[k]?.hasOwnProperty('low')) {
+					data[k] = protobuf.LongToNumber(data[k])
+				} else {
+					protobuf.FoeEachLongToNumber(data[k])
+				}
+			}
+		})
+		return data
+	},
+}
 export default request

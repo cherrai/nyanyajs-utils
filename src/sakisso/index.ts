@@ -7,6 +7,8 @@ export class SakiSSOClient {
 		v1: {
 			prefix: '/api/v1',
 			checkToken: '/user/check/token',
+			anonymousUserGetAppToken: '/anonymousUser/appToken/get',
+			anonymousUserVerifyAppToken: '/anonymousUser/appToken/verify',
 		},
 	}
 	appId: string = ''
@@ -38,6 +40,8 @@ export class SakiSSOClient {
 		clientUrl && (this.clientUrl = clientUrl)
 		serverUrl && (this.serverUrl = serverUrl)
 		userAgent && (this.userAgent = userAgent)
+
+		this.anonymousUser = this.initAnonymousUser() as any
 	}
 	logout() {
 		this.clear()
@@ -187,6 +191,47 @@ export class SakiSSOClient {
 		window.location.href = loginUrl
 		// 3、去登錄
 		// 4、返回數據
+	}
+
+	anonymousUser: ReturnType<this['initAnonymousUser']>
+	initAnonymousUser() {
+		return {
+			// getAppToken: async (token?: string) => {
+			// 	console.log(token, 11111111111)
+			// 	const res = await axios({
+			// 		method: 'GET',
+			// 		url:
+			// 			this.serverUrl +
+			// 			this.apiUrls.v1.prefix +
+			// 			this.apiUrls.v1.anonymousUserGetAppToken,
+			// 		// url: 'http://192.168.0.103:23160/api/v1/user/check',
+			// 		params: {
+			// 			appId: this.appId,
+			// 			token: options.token,
+			// 			deviceId: options.deviceId,
+			// 			userAgent: options.userAgent || this.userAgent,
+			// 		},
+			// 	})
+			// 	console.log('checkToken', res.data)
+			// 	if (res?.data?.code === 200) {
+			// 		// 需要存储进缓存
+			// 		this.userInfo = res?.data?.data?.userInfo
+			// 		this.token = res?.data?.data?.token
+			// 		this.deviceId = res?.data?.data?.deviceId
+
+			// 		return {
+			// 			token: this.token,
+			// 			userInfo: this.userInfo,
+			// 			deviceId: this.deviceId,
+			// 		}
+			// 	} else {
+			// 		this.token = ''
+			// 		this.loginTime = 0
+			// 		this.userInfo = {}
+			// 		return false
+			// 	}
+			// },
+		}
 	}
 }
 

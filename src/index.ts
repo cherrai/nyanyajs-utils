@@ -21,6 +21,9 @@ import {
 import SAaSS from './saass'
 import { SakiSSOClient } from './sakisso'
 import { deepCopy, NetworkStatus } from './common/common'
+import { validation } from './validation'
+import { NEventListener } from './common/neventListener'
+import { compareUnicodeOrder, getInitials } from './nstring/common'
 
 export {
 	Debounce,
@@ -45,6 +48,10 @@ export {
 	images,
 	NSocketIoClient,
 	file,
+	validation,
+	NEventListener,
+	compareUnicodeOrder,
+	getInitials,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
@@ -72,6 +79,10 @@ export default {
 	images,
 	NSocketIoClient,
 	file,
+	validation,
+	NEventListener,
+	compareUnicodeOrder,
+	getInitials,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
