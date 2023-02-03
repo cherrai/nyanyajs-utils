@@ -48,7 +48,13 @@ export const resize = async (file: File, options: ResizeOption) => {
 		// console.log(file, options)
 		if (!file) {
 			console.error('file does not exist')
-			return
+			return {
+				dataURL: '',
+				blob: new Blob(),
+				file: new File([], ''),
+				width: 0,
+				height: 0,
+			}
 		}
 
 		// 改变图片的src
@@ -83,6 +89,8 @@ export const convert = (
 		dataURL: string
 		blob: Blob
 		file: File
+		width: number
+		height: number
 	}>(async (resolve, reject) => {
 		try {
 			var tempImg = document.createElement('img')
@@ -93,9 +101,9 @@ export const convert = (
 			var cvs = document.createElement('canvas')
 			var ctx = cvs.getContext('2d')
 
-			var cvsWidth = null
-			var cvsHeight = null
-			var tempNum = null
+			var cvsWidth = 0
+			var cvsHeight = 0
+			var tempNum = 0
 
 			tempImg.onload = async () => {
 				const exif = options?.exif || (await getExif(file))
@@ -104,7 +112,7 @@ export const convert = (
 				// if (!options.width || !options.height) {
 				// 	maxPixel = options.width || options.height
 				// }
-				// console.log('maxPixel', maxPixel)
+				console.log('maxPixel', maxPixel)
 
 				let imgType = 'image/jpeg'
 
@@ -113,12 +121,23 @@ export const convert = (
 					// console.log(tempImg.naturalHeight,tempImg.naturalWidth);
 					// 只限制宽度、如果宽度低于最大宽度、那么原图分辨率显示
 					if (tempImg.naturalWidth > tempImg.naturalHeight) {
-						cvsWidth = maxPixel
-						cvsHeight =
-							(tempImg.naturalHeight / tempImg.naturalWidth) * maxPixel
+						if (maxPixel > tempImg.naturalWidth) {
+							cvsWidth = tempImg.naturalWidth
+							cvsHeight = tempImg.naturalWidth
+						} else {
+							cvsWidth = maxPixel
+							cvsHeight =
+								(tempImg.naturalHeight / tempImg.naturalWidth) * maxPixel
+						}
 					} else {
-						cvsWidth = (tempImg.naturalWidth / tempImg.naturalHeight) * maxPixel
-						cvsHeight = maxPixel
+						if (maxPixel > tempImg.naturalHeight) {
+							cvsWidth = tempImg.naturalWidth
+							cvsHeight = tempImg.naturalWidth
+						} else {
+							cvsWidth =
+								(tempImg.naturalWidth / tempImg.naturalHeight) * maxPixel
+							cvsHeight = maxPixel
+						}
 					}
 
 					// if (tempImg.naturalWidth > tempImg.naturalHeight) {
@@ -200,13 +219,18 @@ export const convert = (
 
 				cvs.toBlob(
 					(blob) => {
-						const cFile = new File([blob], file.name, {
+						if (!blob) {
+							reject('blob dose not exits')
+						}
+						const cFile = new File([blob as any], file.name, {
 							type: file.type,
 						})
 						resolve({
 							dataURL: cvs.toDataURL(imgType, options.quality),
-							blob,
+							blob: blob as any,
 							file: cFile,
+							width: cvsWidth,
+							height: cvsHeight,
 						})
 					},
 					imgType,

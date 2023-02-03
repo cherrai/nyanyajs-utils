@@ -56,6 +56,27 @@ const resq: requestConfig<{
 	},
 }
 
+const interceptorsRequestForEach = async (config: any, index: number = 0) => {
+	if (interceptors.request.handlers.length) {
+		const c = await interceptors.request.handlers[index].fulfilled(config)
+		if (interceptors.request.handlers.length - 1 === index) {
+			return c
+		}
+		return await interceptorsRequestForEach(c, index + 1)
+	}
+	return config
+}
+const interceptorsResponseForEach = async (res: any, index: number = 0) => {
+	if (interceptors.response.handlers.length) {
+		const c = await interceptors.response.handlers[index].fulfilled(res)
+		if (interceptors.response.handlers.length - 1 === index) {
+			return c
+		}
+		return await interceptorsResponseForEach(c, index + 1)
+	}
+	return res
+}
+
 // AxiosRequestConfig<any>
 export const request = async <T = any>(
 	config: requestConfig<T>
@@ -67,9 +88,10 @@ export const request = async <T = any>(
 		}
 		config.data.requestTime = Math.floor(new Date().getTime() / 1000)
 
-		interceptors.request.handlers.forEach((item) => {
-			item?.fulfilled && (config = item.fulfilled(config))
-		})
+		// interceptors.request.handlers.forEach((item) => {
+		// 	item?.fulfilled && (config = item.fulfilled(config))
+		// })
+		config = await interceptorsRequestForEach(config)
 		let axiosConfig: any = {
 			...config,
 		}
@@ -117,9 +139,11 @@ export const request = async <T = any>(
 				`[meowyeah request sdk] Error: The current request consumed ${res.data.responseTime}ms.`
 			)
 		}
-		interceptors.response.handlers.forEach((item) => {
-			res = item.fulfilled(res)
-		})
+
+		// interceptors.response.handlers.forEach((item) => {
+		// 	res = item.fulfilled(res)
+		// })
+		res =await interceptorsResponseForEach(res)
 		return res
 	} catch (error) {
 		// console.log(error)
@@ -135,8 +159,12 @@ export const request = async <T = any>(
 	}
 }
 
-export type useRequestFunc = (config: requestConfig<any>) => requestConfig
-export type useResponseFunc = (response: AxiosResponse) => AxiosResponse
+export type useRequestFunc = (
+	config: requestConfig<any>
+) => Promise<requestConfig>
+export type useResponseFunc = (
+	response: AxiosResponse
+) => Promise<AxiosResponse>
 export type useErr = (error: string) => string
 
 class RequestInterceptorManager {
