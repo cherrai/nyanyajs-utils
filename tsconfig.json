@@ -14,7 +14,7 @@
 		// "outDir": "../../nyanya/nyanya-toolbox/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../saki-ui/saki-ui/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
+		"outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
 
 		// "outDir": "../../MetahorizonLab/saki-ui/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../MetahorizonLab/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
@@ -22,7 +22,7 @@
 		// "outDir": "./examples/react/node_modules/@nyanyajs/nyanyadb",
 		// "outDir": "./examples/demo/src/nyanyadb",
 		// "outFile": "./examples/demo/src/nyanyadb.js",
-		"outDir": "./dist",
+		// "outDir": "./dist",
 		"rootDir": "./src",
 		"allowJs": false,
 		"declaration": true,
