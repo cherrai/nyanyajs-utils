@@ -2,13 +2,60 @@ import qs from 'qs'
 import axios from 'axios'
 import { UserAgent } from '../userAgent'
 
+export type UserInfo = {
+	uid: string
+	username: string
+	email: string
+	phone: string
+	nickname: string
+	avatar: string
+	bio: string
+	city: string[]
+	gender: -1 | 1 | 2 | 3 | 4 | 5
+	birthday: string
+	status: -1 | 0 | 1
+	additionalInformation: {
+		[k: string]: any
+	}
+	appData: {
+		[k: string]: any
+	}
+	creationTime: number
+	lastUpdateTime: number
+	lastSeenTime: number
+}
+
+export const defaultValue: {
+	userInfo: UserInfo
+} = {
+	userInfo: {
+		uid: '',
+		username: '',
+		email: '',
+		phone: '',
+		nickname: '',
+		avatar: '',
+		bio: '',
+		city: [],
+		gender: -1,
+		birthday: '',
+		status: -1,
+		additionalInformation: {},
+		appData: {},
+		creationTime: -1,
+		lastUpdateTime: -1,
+		lastSeenTime: -1,
+	},
+}
+
 export class SakiSSOClient {
 	private apiUrls = {
 		v1: {
 			prefix: '/api/v1',
 			checkToken: '/user/check/token',
-			anonymousUserGetAppToken: '/anonymousUser/appToken/get',
-			anonymousUserVerifyAppToken: '/anonymousUser/appToken/verify',
+			// anonymousUserGetAppToken: '/anonymousUser/appToken/get',
+			// anonymousUserVerifyAppToken: '/anonymousUser/appToken/verify',
+			// anonymousUserVerifyToken: '/anonymousUser/token/verify',
 		},
 	}
 	appId: string = ''
@@ -41,7 +88,7 @@ export class SakiSSOClient {
 		serverUrl && (this.serverUrl = serverUrl)
 		userAgent && (this.userAgent = userAgent)
 
-		this.anonymousUser = this.initAnonymousUser() as any
+		// this.anonymousUser = this.initAnonymousUser() as any
 	}
 	logout() {
 		this.clear()
@@ -193,46 +240,72 @@ export class SakiSSOClient {
 		// 4、返回數據
 	}
 
-	anonymousUser: ReturnType<this['initAnonymousUser']>
-	initAnonymousUser() {
-		return {
-			// getAppToken: async (token?: string) => {
-			// 	console.log(token, 11111111111)
-			// 	const res = await axios({
-			// 		method: 'GET',
-			// 		url:
-			// 			this.serverUrl +
-			// 			this.apiUrls.v1.prefix +
-			// 			this.apiUrls.v1.anonymousUserGetAppToken,
-			// 		// url: 'http://192.168.0.103:23160/api/v1/user/check',
-			// 		params: {
-			// 			appId: this.appId,
-			// 			token: options.token,
-			// 			deviceId: options.deviceId,
-			// 			userAgent: options.userAgent || this.userAgent,
-			// 		},
-			// 	})
-			// 	console.log('checkToken', res.data)
-			// 	if (res?.data?.code === 200) {
-			// 		// 需要存储进缓存
-			// 		this.userInfo = res?.data?.data?.userInfo
-			// 		this.token = res?.data?.data?.token
-			// 		this.deviceId = res?.data?.data?.deviceId
-
-			// 		return {
-			// 			token: this.token,
-			// 			userInfo: this.userInfo,
-			// 			deviceId: this.deviceId,
-			// 		}
-			// 	} else {
-			// 		this.token = ''
-			// 		this.loginTime = 0
-			// 		this.userInfo = {}
-			// 		return false
-			// 	}
-			// },
-		}
-	}
+	// anonymousUser: ReturnType<this['initAnonymousUser']>
+	// initAnonymousUser() {
+	// 	return {
+	// 		// verifyAppToken: async (token?: string) => {
+	// 		// 	// console.log('verifyAppToken,api', {
+	// 		// 	// 	appId: this.appId,
+	// 		// 	// 	appToken: token,
+	// 		// 	// 	userAgent: this.userAgent,
+	// 		// 	// })
+	// 		// 	const res = await axios({
+	// 		// 		method: 'POST',
+	// 		// 		url:
+	// 		// 			this.serverUrl +
+	// 		// 			this.apiUrls.v1.prefix +
+	// 		// 			this.apiUrls.v1.anonymousUserVerifyAppToken,
+	// 		// 		data: {
+	// 		// 			appId: this.appId,
+	// 		// 			appToken: token,
+	// 		// 			userAgent: this.userAgent,
+	// 		// 		},
+	// 		// 	})
+	// 		// 	// console.log(res)
+	// 		// 	if (res?.data?.code === 200 && res.data?.data?.token) {
+	// 		// 		return res.data.data.token
+	// 		// 	} else {
+	// 		// 		return ''
+	// 		// 	}
+	// 		// },
+	// 		// verifyUserToken: async ({
+	// 		// 	appToken,
+	// 		// 	token,
+	// 		// 	deviceId,
+	// 		// }: {
+	// 		// 	appToken: string
+	// 		// 	token: string
+	// 		// 	deviceId: string
+	// 		// }) => {
+	// 		// 	const res = await axios({
+	// 		// 		method: 'POST',
+	// 		// 		url:
+	// 		// 			this.serverUrl +
+	// 		// 			this.apiUrls.v1.prefix +
+	// 		// 			this.apiUrls.v1.anonymousUserVerifyToken,
+	// 		// 		data: {
+	// 		// 			appId: this.appId,
+	// 		// 			appToken: appToken,
+	// 		// 			token: token,
+	// 		// 			deviceId: deviceId,
+	// 		// 			userAgent: this.userAgent,
+	// 		// 		},
+	// 		// 	})
+	// 		// 	// console.log('verifyUserToken', res.data)
+	// 		// 	if (res?.data?.code === 200) {
+	// 		// 		return {
+	// 		// 			token: res.data.data.token,
+	// 		// 			userInfo: res.data.data.userInfo,
+	// 		// 			deviceId: res.data.data.deviceId,
+	// 		// 		}
+	// 		// 	} else if (res?.data?.code === 10029) {
+	// 		// 		return 10029
+	// 		// 	} else {
+	// 		// 		return 10004
+	// 		// 	}
+	// 		// },
+	// 	}
+	// }
 }
 
 export default SakiSSOClient

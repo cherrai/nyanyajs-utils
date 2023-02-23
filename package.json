@@ -1,13 +1,13 @@
 {
 	"name": "@nyanyajs/utils",
-	"version": "1.0.15",
+	"version": "1.0.17",
 	"description": "nyanyajs/utils",
 	"main": "./dist/index.js",
 	"scripts": {
 		"test:watch": "nodemon -e ts,tsx --exec ts-node ./test/index.ts",
 		"build": "tsc",
 		"pub": "npm publish --registry https://registry.npm.aiiko.club",
-		"unpub": "npm unpublish @nyanyajs/utils@1.0.10  --registry https://registry.npm.aiiko.club"
+		"unpub": "npm unpublish @nyanyajs/utils@1.0.15  --registry https://registry.npm.aiiko.club"
 	},
 	"author": "shiina_aiiko",
 	"repository": {

@@ -43,7 +43,8 @@ export class Rule {
 				break
 
 			case 'Type':
-				b = typeof v !== this.v
+				b = typeof v === this.v
+				// console.log(b, typeof v, this.v)
 				if (!b) {
 					return (
 						'“' +

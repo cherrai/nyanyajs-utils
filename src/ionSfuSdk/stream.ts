@@ -1,11 +1,25 @@
 import { SFUClient } from './client'
-import { QueueLoop } from '../queueloop'
+import { deepCopy, QueueLoop } from '..'
 import * as Ion from 'ion-sdk-js/lib/connector'
 
 import { Client, LocalStream, RemoteStream } from 'ion-sdk-js'
-import { UserAgent, userAgent } from '../userAgent'
 
+import { UserAgent, userAgent } from '../userAgent'
 import { StreamStats, ClientInfo } from './types'
+
+export interface ConnectionQualityStats {
+	count: {
+		fail: number
+		connected: number
+		disconnect: number
+	}
+	startTime: number
+	endTime: number
+}
+
+const cqs: {
+	[id: string]: ConnectionQualityStats
+} = {}
 
 export class SFUStream extends EventTarget {
 	private sfuClient: SFUClient
@@ -14,6 +28,19 @@ export class SFUStream extends EventTarget {
 	clientInfo: ClientInfo
 	type: 'Remote' | 'Local'
 	callType: 'Audio' | 'Video' | 'ScreenShare'
+	isDisconnectStream = false
+	status: 'connected' | 'connecting' | 'disconnect' | 'fail' | '' = ''
+	// connectionQualityStats: ConnectionQualityStats = {
+	// 	count: {
+	// 		fail: 0,
+	// 		connected: 0,
+	// 		disconnect: 0,
+	// 	},
+	// 	startTime: 0,
+	// 	endTime: 0,
+	// }
+	reconnectionCount = 0
+	timer?: NodeJS.Timeout
 	stream: LocalStream | RemoteStream
 	constraints?: Ion.Constraints
 	isSpeaker: boolean = false
@@ -54,6 +81,19 @@ export class SFUStream extends EventTarget {
 		this.type = options.type
 		this.stream = options.stream
 		this.stats = options.stats
+
+		cqs[this.id] = {
+			count: {
+				fail: 0,
+				connected: 0,
+				disconnect: 0,
+			},
+			startTime: 0,
+			endTime: 0,
+		}
+	}
+	getconnectionQualityStats() {
+		return cqs[this.id]
 	}
 	unmute(kind: 'video' | 'audio') {
 		this.stream.unmute(kind)
@@ -91,29 +131,92 @@ export class SFUStream extends EventTarget {
 				break
 		}
 	}
-	unpublish() {
-		const ls: any = this.stream
-		if (
-			this.type === 'Local' &&
-			this.sfuClient.dc.readyState === 'open' &&
-			ls?.pc?.connectionState === 'connected'
-		) {
-			if (this.stream.getTracks().length) {
-				// console.log(this.localStream.getTracks())
-				this.stream.getTracks().forEach((track) => {
-					track.dispatchEvent(new Event('ended'))
-					track.stop()
-					ls?.removeTrack(track)
-					// this.sfuClient.dc.readyState === 'open' &&
-					// 	track.readyState === 'live' &&
-					// 	ls?.removeTrack(track)
-				})
-				this.stream.dispatchEvent(new Event('removetrack'))
-				ls.unpublish()
-				// this.dispatchEvent(new Event('removetrack'))
-			}
+	setStatus(v: 'connected' | 'connecting' | 'disconnect' | 'fail' | '') {
+		console.log('setStatusstrream', this, v, cqs)
+		cqs[this.id] = deepCopy(cqs[this.id])
+		this.status = v
+
+		switch (v) {
+			case 'disconnect':
+				cqs[this.id].count.disconnect = cqs[this.id].count.disconnect + 1
+
+				this.queueloop.increase(
+					'republish',
+					() => {
+						console.log('republishstatus', this.status)
+						this.status === 'disconnect' && this.republish()
+					},
+					{
+						loop: false,
+						count: 1,
+					}
+				)
+				this.reconnectionCount++
+				if (this.reconnectionCount > 3) {
+					this.unpublish()
+					clearTimeout(this.timer)
+				}
+
+				break
+			case 'connected':
+				this.queueloop.decrease('republish')
+				cqs[this.id].count.connected = cqs[this.id].count.connected + 1
+
+				cqs[this.id].startTime = Math.round(new Date().getTime() / 1000)
+
+				this.timer = setTimeout(() => {
+					this.reconnectionCount = 0
+				}, 5000)
+
+				this.dispatchEvent(new Event('connected'))
+
+				break
+			case 'fail':
+				this.unpublish()
+
+				break
+
+			default:
+				this.queueloop.decrease('republish')
+				break
 		}
+	}
+	unpublish() {
+		if (this.isDisconnectStream) return
+		this.dispatchEvent(new Event('disconnect'))
+		this.queueloop.decrease('republish')
+		cqs[this.id].count.fail = cqs[this.id].count.fail + 1
+		cqs[this.id].endTime = Math.round(new Date().getTime() / 1000)
+
+		this.isDisconnectStream = true
+		const ls: any = this.stream
+		console.log('开始断流', this, ls)
 		this.queueloop.decreaseAll()
+		// if (
+		// 	this.type === 'Local' &&
+		// 	this.sfuClient.dc?.readyState === 'open' &&
+		// 	ls?.pc?.connectionState === 'connected'
+		// ) {
+		if (this.stream.getTracks().length) {
+			// console.log(this.localStream.getTracks())
+			this.stream.getTracks().forEach((track) => {
+				track.dispatchEvent(new Event('ended'))
+				track.stop()
+				ls?.removeTrack(track)
+				// this.sfuClient.dc.readyState === 'open' &&
+				// 	track.readyState === 'live' &&
+				// 	ls?.removeTrack(track)
+			})
+			this.stream.dispatchEvent(new Event('removetrack'))
+			ls?.unpublish?.()
+			// this.dispatchEvent(new Event('removetrack'))
+		}
+		if (this.type === 'Remote') {
+			console.log('远端开始断流')
+			// this.republish()
+			// return
+		}
+		// }
 	}
 	switchDevice(
 		deviceType: 'audio' | 'video' | 'screenShare',
@@ -166,6 +269,16 @@ export class SFUStream extends EventTarget {
 				loop: true,
 			}
 		)
+	}
+	republish() {
+		console.log('republish', this, this.clientInfo)
+		if (this.status === 'fail') return
+		this.dispatchEvent(new Event('reconnect'))
+		const { router, emit, to } = this.sfuClient.DataChannelAPI()
+
+		to({ clientId: this.clientInfo.clientId }).emit('republishStream', {
+			streamId: this.id,
+		})
 	}
 
 	public getStats(

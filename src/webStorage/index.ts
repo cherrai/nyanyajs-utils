@@ -1,6 +1,7 @@
 import { NyaNyaDB, IndexedDB } from '@nyanyajs/nyanyadb'
 import md5 from 'blueimp-md5'
 import { RunQueue } from '../runQueue'
+// import { RunQueue } from '@nyanyajs/utils'
 export interface StorageOptions {
 	storage?: 'LocalStorage' | 'IndexedDB' | 'ElectronNodeFsStorage'
 	baseLabel: string
@@ -173,7 +174,7 @@ export class WebStorage<K = string, T = any> {
 				requestId: '',
 				requestTime: new Date().getTime(),
 			}
-			obj.requestId = md5(JSON.stringify(obj))
+			obj.requestId = md5(JSON.stringify(obj) + Math.random() )
 			// console.log(obj.type, obj.requestId)
 			return obj
 		},
@@ -225,6 +226,7 @@ export class WebStorage<K = string, T = any> {
 					}
 					const { ipcRenderer } = electron
 					const params = getParams(data)
+					console.log(params.requestId, data)
 					ipcRenderer?.send?.('NodeFsStoragerAPI', params)
 					requestFunc(params.requestId, (data) => {
 						resolve(data.value)
@@ -237,9 +239,9 @@ export class WebStorage<K = string, T = any> {
 	}
 	static electronNodeFsStorageStatus = false
 	static electronNodeFsStorageInit() {
-    if (typeof window === 'undefined') {
-      return
-    }
+		if (typeof window === 'undefined') {
+			return
+		}
 		if (!window?.require) return
 
 		if (WebStorage.electronNodeFsStorageStatus) return
@@ -254,7 +256,7 @@ export class WebStorage<K = string, T = any> {
 		ipcRenderer.on(
 			'NodeFsStorageROUTER',
 			(
-				event,
+				event: any,
 				arg: {
 					requestId: string
 					requestTime: number
@@ -266,6 +268,7 @@ export class WebStorage<K = string, T = any> {
 			) => {
 				// console.log(arg, requestObj, !!requestObj[arg.requestId])
 				WebStorage.electronNodeFsStorageRequestObj?.[arg.requestId]?.(arg)
+				delete WebStorage.electronNodeFsStorageRequestObj?.[arg.requestId]
 			}
 		)
 		WebStorage.electronNodeFsStorageStatus = true
@@ -392,6 +395,7 @@ export class WebStorage<K = string, T = any> {
 							key: String(key),
 							label: this.label,
 						})
+						console.log('ElectronNodeFsStorage', key, v)
 						this.map[String(key)] = v
 						resolve(v)
 						break
@@ -404,6 +408,88 @@ export class WebStorage<K = string, T = any> {
 				return reject(this.undefinedValue())
 			}
 		})
+	}
+	public getSync(key: K): T {
+		if (!key) {
+			return this.undefinedValue()
+		}
+		const k = this.getKey(key)
+		switch (this.storage) {
+			case 'LocalStorage':
+				try {
+					if (this.map[k]) {
+						const vObj = this.map[k]
+						if (vObj.expiration === -1) {
+							this.map[k] = vObj
+							return vObj.value
+						} else {
+							if (vObj.expiration >= new Date().getTime()) {
+								this.map[k] = vObj
+								return vObj.value
+							} else {
+								this.delete(key)
+								return this.undefinedValue()
+							}
+						}
+					}
+					const v = localStorage.getItem(k)
+					if (!v) {
+						return this.undefinedValue()
+					}
+					const vObj: Value<T> = JSON.parse(v)
+					if (!vObj?.value) {
+						return this.undefinedValue()
+					}
+					if (vObj.expiration === -1) {
+						this.map[k] = vObj
+						return vObj.value
+					} else {
+						if (vObj.expiration >= new Date().getTime()) {
+							this.map[k] = vObj
+							return vObj.value
+						} else {
+							this.delete(key)
+							return this.undefinedValue()
+						}
+					}
+				} catch (error) {
+					console.error(error)
+					return this.undefinedValue()
+				}
+				break
+			case 'IndexedDB':
+				if (this.map[k]) {
+					if (this.map[k].expiration === -1) {
+						return this.map[k].value
+					} else {
+						if (this.map[k].expiration >= new Date().getTime()) {
+							return this.map[k].value
+						} else {
+							this.delete(key)
+							return this.undefinedValue()
+						}
+					}
+				} else {
+					this.get(key).then()
+					return this.undefinedValue()
+				}
+			case 'ElectronNodeFsStorage':
+				console.error(
+					'ElectronNodeFsStorage does not support synchronous functions'
+				)
+				break
+			// throw 'IndexedDB does not support synchronous functions'
+
+			default:
+				break
+		}
+		return this.undefinedValue()
+	}
+	public async getAndSet(key: K, func: (value: T) => Promise<T>) {
+		const v = await this.get(key)
+		const nv = await func(v)
+		await this.set(key, nv)
+		return nv
 	}
 	public async getAll() {
 		return new Promise<
@@ -499,88 +585,6 @@ export class WebStorage<K = string, T = any> {
 			return []
 		}
 		return []
-	}
-	public getSync(key: K): T {
-		if (!key) {
-			return this.undefinedValue()
-		}
-		const k = this.getKey(key)
-		switch (this.storage) {
-			case 'LocalStorage':
-				try {
-					if (this.map[k]) {
-						const vObj = this.map[k]
-						if (vObj.expiration === -1) {
-							this.map[k] = vObj
-							return vObj.value
-						} else {
-							if (vObj.expiration >= new Date().getTime()) {
-								this.map[k] = vObj
-								return vObj.value
-							} else {
-								this.delete(key)
-								return this.undefinedValue()
-							}
-						}
-					}
-					const v = localStorage.getItem(k)
-					if (!v) {
-						return this.undefinedValue()
-					}
-					const vObj: Value<T> = JSON.parse(v)
-					if (!vObj?.value) {
-						return this.undefinedValue()
-					}
-					if (vObj.expiration === -1) {
-						this.map[k] = vObj
-						return vObj.value
-					} else {
-						if (vObj.expiration >= new Date().getTime()) {
-							this.map[k] = vObj
-							return vObj.value
-						} else {
-							this.delete(key)
-							return this.undefinedValue()
-						}
-					}
-				} catch (error) {
-					console.error(error)
-					return this.undefinedValue()
-				}
-				break
-			case 'IndexedDB':
-				if (this.map[k]) {
-					if (this.map[k].expiration === -1) {
-						return this.map[k].value
-					} else {
-						if (this.map[k].expiration >= new Date().getTime()) {
-							return this.map[k].value
-						} else {
-							this.delete(key)
-							return this.undefinedValue()
-						}
-					}
-				} else {
-					this.get(key).then()
-					return this.undefinedValue()
-				}
-			case 'ElectronNodeFsStorage':
-				console.error(
-					'ElectronNodeFsStorage does not support synchronous functions'
-				)
-				break
-			// throw 'IndexedDB does not support synchronous functions'
-
-			default:
-				break
-		}
-		return this.undefinedValue()
-	}
-	public async getAndSet(key: K, func: (value: T) => Promise<T>) {
-		const v = await this.get(key)
-		const nv = await func(v)
-		await this.set(key, nv)
-		return nv
 	}
 	// expiration(s)
 	public set(key: K, value: T, expiration: number = 0) {

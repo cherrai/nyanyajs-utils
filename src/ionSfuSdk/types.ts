@@ -5,8 +5,6 @@ import * as Ion from 'ion-sdk-js/lib/connector'
 import { Client, LocalStream, RemoteStream } from 'ion-sdk-js'
 import { UserAgent, userAgent } from '../userAgent'
 
-import { QueueLoop } from '../queueloop'
-
 export interface StreamStats {
 	video: {
 		bitrate?: number

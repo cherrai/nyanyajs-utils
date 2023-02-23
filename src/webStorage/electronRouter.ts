@@ -15,7 +15,7 @@ export const electronRouter = (ipcMain: any) => {
 			}
 		) => {
 			let storage = NodeFsStorage.storages[data.label]
-			// console.log('storage', storage)
+			// console.log('storage', data)
 			switch (data.type) {
 				case 'set':
 					event.sender.send('NodeFsStorageROUTER', {

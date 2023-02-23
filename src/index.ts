@@ -6,7 +6,7 @@ import WebStorage from './webStorage'
 import { QueueLoop } from './queueloop'
 import { RunQueue } from './runQueue'
 import { NSocketIoClient } from './nsocketio'
-import { request } from './request'
+import { NRequest } from './nrequest'
 import { images } from './images'
 import { file } from './file'
 // import { SFUClient, SFUSignal, SFUStream } from './ionSfuSdk'
@@ -21,6 +21,7 @@ import {
 import SAaSS from './saass'
 import { SakiSSOClient } from './sakisso'
 import { deepCopy, NetworkStatus } from './common/common'
+import { Wait } from './common/wait'
 import { validation } from './validation'
 import { NEventListener } from './common/neventListener'
 import { compareUnicodeOrder, getInitials } from './nstring/common'
@@ -43,7 +44,7 @@ export {
 	SAaSS,
 	deepCopy,
 	RunQueue,
-	request,
+	NRequest,
 	SakiSSOClient,
 	images,
 	NSocketIoClient,
@@ -52,6 +53,7 @@ export {
 	NEventListener,
 	compareUnicodeOrder,
 	getInitials,
+	Wait,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
@@ -74,7 +76,7 @@ export default {
 	SAaSS,
 	deepCopy,
 	RunQueue,
-	request,
+	NRequest,
 	SakiSSOClient,
 	images,
 	NSocketIoClient,
@@ -83,6 +85,7 @@ export default {
 	NEventListener,
 	compareUnicodeOrder,
 	getInitials,
+	Wait,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
