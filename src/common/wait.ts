@@ -34,4 +34,7 @@ export class Wait {
 		})
 		this.handlers[key].fl = []
 	}
+	revoke(key: string = 'wait') {
+		this.handlers[key].status = 0
+	}
 }

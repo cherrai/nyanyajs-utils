@@ -18,7 +18,7 @@ import {
 	RSA,
 	AES,
 } from './cipher'
-import SAaSS from './saass'
+import { SAaSS } from './saass'
 import { SakiSSOClient } from './sakisso'
 import { deepCopy, NetworkStatus } from './common/common'
 import { Wait } from './common/wait'
