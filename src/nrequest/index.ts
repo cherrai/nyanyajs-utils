@@ -18,6 +18,7 @@ export type ResponseData<T = any> = {
 	author: string
 	cnMsg: string
 	msg: string
+	error: string
 	App: string
 	requestTime: number
 	responseTime: number

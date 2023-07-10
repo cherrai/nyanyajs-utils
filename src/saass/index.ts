@@ -1044,6 +1044,9 @@ export class SAaSS extends NEventListener<'AppTokenInvalid'> {
 	// 		throw res
 	// 	}
 	// }
+
+	// 未来改成可以同时上传多个文件，但这样断电断续可能会有点问题，
+	// 那就改成，可以10MB或者50MB的速度上传，未来再说
 	uploadFile(options: {
 		file: File
 		url: string
@@ -1113,6 +1116,7 @@ export class SAaSS extends NEventListener<'AppTokenInvalid'> {
 
 		reader.readAsArrayBuffer(options.file.slice(offset, offset + chunkSize))
 	}
+
 	getHash(result: string | ArrayBuffer) {
 		const r: any = result
 		const wordArray = CryptoJS.lib.WordArray.create(r)
@@ -1122,7 +1126,7 @@ export class SAaSS extends NEventListener<'AppTokenInvalid'> {
 	async createChunkUpload({
 		folderPath,
 		fileName,
-		// chunkSize,
+		chunkSize,
 		visitCount = -1,
 		password = '',
 		expirationTime = -1,
@@ -1134,7 +1138,20 @@ export class SAaSS extends NEventListener<'AppTokenInvalid'> {
 		// 在服务端需要自动加上rootPath,参考folder
 		folderPath: string
 		fileName: string
-		// chunkSize: number
+		// 16 * 1024,
+		// 32 * 1024,
+		// 64 * 1024,
+		// 128 * 1024,
+		// 256 * 1024,
+		// 512 * 1024,
+		// 1024 * 1024,
+		// 2 * 1024 * 1024,
+		// 5 * 1024 * 1024,
+		// 10 * 1024 * 1024,
+		// 20 * 1024 * 1024,
+		// 30 * 1024 * 1024,
+		// 50 * 1024 * 1024
+		chunkSize?: number
 		visitCount?: number
 		password?: string
 		// -1
@@ -1154,16 +1171,28 @@ export class SAaSS extends NEventListener<'AppTokenInvalid'> {
 		// 未来支持联级创建
 		await this.wait.waiting()
 
-		let chunkSize = 128 * 1024
-
-		if (fileInfo.size < 1024 * 1024) {
+		if (!chunkSize) {
 			chunkSize = 128 * 1024
-		}
-		if (fileInfo.size < 1024 * 1024) {
-			chunkSize = 256 * 1024
-		}
-		if (fileInfo.size < 15 * 1024 * 1024) {
-			chunkSize = 512 * 1024
+
+			// console.log(fileInfo.size, fileInfo.size / 1024 / 1024)
+			// 大于10MB
+			if (fileInfo.size > 10 * 1024 * 1024) {
+				chunkSize = 512 * 1024
+			}
+
+			// 大于30MB
+			if (fileInfo.size > 30 * 1024 * 1024) {
+				chunkSize = 1 * 1024 * 1024
+			}
+			if (fileInfo.size > 50 * 1024 * 1024) {
+				chunkSize = 2 * 1024 * 1024
+			}
+			if (fileInfo.size > 100 * 1024 * 1024) {
+				chunkSize = 5 * 1024 * 1024
+			}
+			if (fileInfo.size > 200 * 1024 * 1024) {
+				chunkSize = 10 * 1024 * 1024
+			}
 		}
 		const res = (
 			await this.R.request({

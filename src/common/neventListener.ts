@@ -15,7 +15,7 @@ export class NEventListener<E = string> {
 	}
 	public dispatch<V = any>(event: E, value?: V) {
 		let s: string = String(event)
-		this.handlers[s].forEach((v) => {
+		this.handlers[s]?.forEach((v) => {
 			v?.(value)
 		})
 	}

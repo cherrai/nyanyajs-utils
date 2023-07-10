@@ -20,7 +20,7 @@ import {
 } from './cipher'
 import { SAaSS } from './saass'
 import { SakiSSOClient } from './sakisso'
-import { deepCopy, NetworkStatus } from './common/common'
+import { deepCopy, NetworkStatus, byteConvert } from './common/common'
 import { Wait } from './common/wait'
 import { validation } from './validation'
 import { NEventListener } from './common/neventListener'
@@ -54,6 +54,7 @@ export {
 	compareUnicodeOrder,
 	getInitials,
 	Wait,
+	byteConvert,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
@@ -86,6 +87,7 @@ export default {
 	compareUnicodeOrder,
 	getInitials,
 	Wait,
+	byteConvert,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
