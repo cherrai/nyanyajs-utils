@@ -4,7 +4,7 @@ import { userAgent } from './userAgent'
 import WebStorage from './webStorage'
 // import { NodeFsStorage } from './webStorage/node'
 import { QueueLoop } from './queueloop'
-import { RunQueue } from './runQueue'
+import { AsyncQueue } from './asyncQueue'
 import { NSocketIoClient } from './nsocketio'
 import { NRequest } from './nrequest'
 import { images } from './images'
@@ -23,8 +23,12 @@ import { SakiSSOClient } from './sakisso'
 import { deepCopy, NetworkStatus, byteConvert } from './common/common'
 import { Wait } from './common/wait'
 import { validation } from './validation'
+import { NyaNyaWasm } from './webAssembly'
 import { NEventListener } from './common/neventListener'
 import { compareUnicodeOrder, getInitials } from './nstring/common'
+import { WebWorker } from './webWorker'
+import { getShortId, getRandomStringInSpecifiedRange } from './shortId'
+import { NWebRTC } from './nwebrtc'
 
 export {
 	Debounce,
@@ -43,7 +47,6 @@ export {
 	// SFUStream,
 	SAaSS,
 	deepCopy,
-	RunQueue,
 	NRequest,
 	SakiSSOClient,
 	images,
@@ -55,6 +58,12 @@ export {
 	getInitials,
 	Wait,
 	byteConvert,
+	NyaNyaWasm,
+	AsyncQueue,
+	WebWorker,
+	getShortId,
+	getRandomStringInSpecifiedRange,
+	NWebRTC,
 	// NetworkStatus,
 	// NodeFsStorage,
 }
@@ -76,7 +85,6 @@ export default {
 	// SFUStream,
 	SAaSS,
 	deepCopy,
-	RunQueue,
 	NRequest,
 	SakiSSOClient,
 	images,
@@ -88,6 +96,12 @@ export default {
 	getInitials,
 	Wait,
 	byteConvert,
+	NyaNyaWasm,
+	AsyncQueue,
+	WebWorker,
+	getShortId,
+	getRandomStringInSpecifiedRange,
+	NWebRTC,
 	// NetworkStatus,
 	// NodeFsStorage,
 }

@@ -1,7 +1,9 @@
 import io, { Manager } from 'socket.io-client'
 import md5 from 'blueimp-md5'
 import { NEventListener } from '../common/neventListener'
+// import { QueueLoop } from '../'
 import { QueueLoop } from '../'
+// import { NEventListener, QueueLoop } from '@nyanyajs/utils'
 export type ResponseData<T = any> = {
 	code: number
 	data: T
@@ -58,10 +60,19 @@ export type RouterGroupApi = {
 	}) => RouterGroupApi
 }
 
-type Status = 'connected' | 'connecting' | 'disconnect'
+type Status = 'connected' | 'connecting' | 'disconnect' | 'close'
 
-export class NSocketIoClient extends NEventListener<Status> {
+export class NSocketIoClient extends NEventListener<{
+	connected: NSocketIoClient
+	connecting: {
+		reconnectCount: number
+	}
+	disconnect: NSocketIoClient
+	close: NSocketIoClient
+}> {
 	status: Status = 'disconnect'
+	private reconnectCount = 0
+	maxReconnectCount = 5
 	manager: SocketIOClient.Manager | undefined
 	uri: string
 	opts: SocketIOClient.ConnectOpts | undefined
@@ -76,10 +87,13 @@ export class NSocketIoClient extends NEventListener<Status> {
 		uri: string
 		opts?: SocketIOClient.ConnectOpts
 		heartbeatInterval?: number
+		maxReconnectCount?: number
 	}) {
 		super()
-		const { uri, opts } = options
+		const { uri, opts, maxReconnectCount } = options
 		this.uri = uri
+		this.maxReconnectCount >= 0 &&
+			(this.maxReconnectCount = maxReconnectCount || 0)
 		this.opts = opts || {}
 		options.hasOwnProperty('heartbeatInterval') &&
 			(this.heartbeatInterval = options.heartbeatInterval || 0)
@@ -94,12 +108,19 @@ export class NSocketIoClient extends NEventListener<Status> {
 			console.log('this.manager', this.manager)
 			let isShowLog = false
 			this.manager?.on('connect', (attempt: any) => {
+				this.reconnectCount = 0
 				isShowLog && console.log('connect')
 				this.setStatus('connected')
 			})
 			this.manager?.on('reconnect', (attempt: any) => {
 				isShowLog && console.log('reconnect')
+				this.reconnectCount++
+
+				console.log('reconnectCount', this.reconnectCount)
 				this.setStatus('connecting')
+				if (this.reconnectCount >= this.maxReconnectCount) {
+					this.close()
+				}
 			})
 			this.manager?.on('connect_error', (error: Error) => {
 				isShowLog && console.log('connect_error', error)
@@ -131,7 +152,7 @@ export class NSocketIoClient extends NEventListener<Status> {
 		}
 	}
 
-	static Response = Response
+	// static Response = Response
 	private middleware: {
 		request: requestMiddlewareType[]
 		response: responseMiddlewareType[]
@@ -150,7 +171,13 @@ export class NSocketIoClient extends NEventListener<Status> {
 	setStatus(s: Status) {
 		if (this.status !== s) {
 			this.status = s
-			this.dispatch(s)
+			if (s === 'connecting') {
+				this.dispatch(s, {
+					reconnectCount: this.reconnectCount,
+				})
+				return
+			}
+			this.dispatch(s as any, this)
 			// this.dispatchEvent(new Event(s))
 		}
 	}
@@ -235,6 +262,7 @@ export class NSocketIoClient extends NEventListener<Status> {
 		Object.keys(this.namespace).forEach((namespace) => {
 			this.namespace[namespace].disconnect()
 		})
+		this.setStatus('close')
 	}
 	router(
 		namespace: string,

@@ -32,7 +32,6 @@ export interface StreamStats {
 	}
 }
 
-
 export interface DATAChannelRouterResponse {
 	eventName: string
 	requestId: string
@@ -64,4 +63,19 @@ export interface RoomClientsItem {
 	clientInfo: ClientInfo
 	publishStream: boolean
 	dc: RTCDataChannel
+}
+
+export interface FileInfo {
+	id: string
+
+	name: string
+	size: number
+	type: string
+	fileSuffix: string
+	lastModified: number
+	hash: string
+	chunkSize: number
+
+	width: number
+	height: number
 }

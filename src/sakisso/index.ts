@@ -1,6 +1,7 @@
 import qs from 'qs'
 import axios from 'axios'
 import { UserAgent } from '../userAgent'
+import { createLocalUser, getLocalUsers } from './localUser'
 
 export type UserInfo = {
 	uid: string
@@ -307,5 +308,7 @@ export class SakiSSOClient {
 	// 	}
 	// }
 }
+
+export { createLocalUser, getLocalUsers }
 
 export default SakiSSOClient

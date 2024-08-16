@@ -1,4 +1,5 @@
 import EXIF from 'exif-js'
+import { NyaNyaWasm } from '../webAssembly'
 
 type ExifType = {
 	Orientation: number
@@ -14,6 +15,7 @@ type ResizeOption = {
 	height?: number
 	quality: number
 	exif?: ExifType
+	platform?: 'canvas' | 'wasm'
 }
 export const getExif = (file: File) => {
 	return new Promise<ExifType>(function (resolve, reject) {
@@ -44,6 +46,51 @@ export const getExif = (file: File) => {
 	})
 }
 export const resize = async (file: File, options: ResizeOption) => {
+	if (options.platform === 'wasm') {
+		const wasmAPI = await NyaNyaWasm.WasmAPI()
+		const uint8Array = new Uint8Array(await file.arrayBuffer())
+
+		const result = await wasmAPI?.images.resize(uint8Array, {
+			maxPixel: options.maxPixel || 0,
+			width: options.width || 0,
+			height: options.height || 0,
+			quality: options.quality,
+		})
+		console.log('result', result)
+		if (!result?.result)
+			return {
+				dataURL: '',
+				blob: new Blob(),
+				file: new File([], ''),
+				width: 0,
+				height: 0,
+			}
+
+		const base64 =
+			'data:' +
+			file.type +
+			';base64,' +
+			window.btoa(
+				result.result.reduce((data, byte) => {
+					return data + String.fromCharCode(byte)
+				}, '')
+			)
+		const b = new Blob([result?.result?.buffer as any], {
+			type: file.type,
+		})
+		const cFile = new File([b], file.name, {
+			type: file.type,
+		})
+		return {
+			dataURL: base64,
+			blob: b,
+			file: cFile,
+			width: result.width,
+			height: result.height,
+			// arrayBuffer: result?.result,
+		}
+	}
+
 	if (options.maxPixel) {
 		// console.log(file, options)
 		if (!file) {

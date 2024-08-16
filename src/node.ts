@@ -4,7 +4,7 @@ import { userAgent } from './userAgent'
 // import WebStorage from './webStorage'
 // import { NodeFsStorage } from './webStorage/node'
 import { QueueLoop } from './queueloop'
-import { RunQueue } from './runQueue'
+import { AsyncQueue } from './asyncQueue'
 // import { NSocketIoClient } from './nsocketio'
 // import { request } from './request'
 // import { images } from './images'
@@ -27,6 +27,7 @@ import { compareUnicodeOrder, getInitials } from './nstring/common'
 import { NodeFsStorage } from './webStorage/node'
 import { validation } from './validation'
 import { electronRouter } from './webStorage/electronRouter'
+import { getShortId, getRandomStringInSpecifiedRange } from './shortId'
 
 export {
 	Debounce,
@@ -45,7 +46,9 @@ export {
 	electronRouter,
 	validation,
 	deepCopy,
-	RunQueue,
+	AsyncQueue,
+	getShortId,
+	getRandomStringInSpecifiedRange,
 }
 
 export default {
@@ -65,5 +68,7 @@ export default {
 	electronRouter,
 	validation,
 	deepCopy,
-	RunQueue,
+	AsyncQueue,
+	getShortId,
+	getRandomStringInSpecifiedRange,
 }

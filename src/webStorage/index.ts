@@ -1,6 +1,7 @@
 import { NyaNyaDB, IndexedDB } from '@nyanyajs/nyanyadb'
 import md5 from 'blueimp-md5'
-import { RunQueue } from '../runQueue'
+import QueueLoop from '../queueloop'
+import { AsyncQueue } from '../asyncQueue'
 // import { RunQueue } from '@nyanyajs/utils'
 export interface StorageOptions {
 	storage?: 'LocalStorage' | 'IndexedDB' | 'ElectronNodeFsStorage'
@@ -73,10 +74,10 @@ export class WebStorage<K = string, T = any> {
 	} = {}
 	static storageKeys: WebStorage<string, string[]>
 	public keys: K[] = []
-	private rq: RunQueue
+	private asyncQueue = new AsyncQueue()
 	private changeLabelHandlers: (() => void)[] = []
+
 	constructor(options: StorageOptions) {
-		this.rq = new RunQueue()
 		options.storage && (this.storage = options.storage)
 		options.baseLabel && (this.baseLabel = options.baseLabel)
 		this.setLabel(options.baseLabel)
@@ -112,7 +113,7 @@ export class WebStorage<K = string, T = any> {
 	private initKeys() {
 		// console.log('initKeys')
 		// this.updateKeys()
-		this.rq.increase(async () => {
+		this.asyncQueue.increase(async () => {
 			let v = await WebStorage.storageKeys.get(this.label)
 
 			!v && (v = [])
@@ -132,7 +133,7 @@ export class WebStorage<K = string, T = any> {
 		}, 'initKeys')
 	}
 	private updateKeys() {
-		this.rq.increase(async () => {
+		this.asyncQueue.increase(async () => {
 			await WebStorage.storageKeys.getAndSet(this.label, async (v) => {
 				!v && (v = [])
 
@@ -174,7 +175,7 @@ export class WebStorage<K = string, T = any> {
 				requestId: '',
 				requestTime: new Date().getTime(),
 			}
-			obj.requestId = md5(JSON.stringify(obj) + Math.random() )
+			obj.requestId = md5(JSON.stringify(obj) + Math.random())
 			// console.log(obj.type, obj.requestId)
 			return obj
 		},
@@ -589,88 +590,101 @@ export class WebStorage<K = string, T = any> {
 	// expiration(s)
 	public set(key: K, value: T, expiration: number = 0) {
 		return new Promise<boolean>(async (resolve, reject) => {
-			try {
-				if (!key) return resolve(false)
-				switch (this.storage) {
-					case 'ElectronNodeFsStorage':
-						const v = await WebStorage.electronNodeFsStorageMethods.request({
-							type: 'set',
-							key: String(key),
-							label: this.label,
-							value: value,
-							expiration,
-						})
-						this.map[String(key)] = v
-						resolve(v)
-						break
-					case 'LocalStorage':
-						resolve(this.setSync(key, value, expiration))
-						break
-					case 'IndexedDB':
-						const k = this.getKey(key)
-						const getValue = await this.get(key)
-						const vObj = this.getValue(value, expiration * 1000)
-						// console.log('vObj', k, vObj,getValue)
-						if (typeof key === 'string') {
-						}
-						if (!getValue) {
-							new WebStorage.model({
-								key: k,
-								data: vObj.toString(),
-								options: JSON.stringify({
-									// v: {
-									// 	expiration: expiration ? expiration * 1000 : -1,
-									// },
-								}),
-								label: this.label,
-							})
-								.Save()
-								.then((res) => {
-									this.map[k] = vObj.toJson()
-									resolve(true)
+			if (!key) return resolve(false)
+
+			this.asyncQueue.increase(async () => {
+				// console.log('waiting', 1, key, value)
+				// await this.asyncWait.waiting('set' + key)
+				// console.log('waiting', 2, key, value)
+				try {
+					switch (this.storage) {
+						case 'ElectronNodeFsStorage':
+							WebStorage.electronNodeFsStorageMethods
+								.request({
+									type: 'set',
+									key: String(key),
+									label: this.label,
+									value: value,
+									expiration,
 								})
-								.catch((err: any) => {
+								.then((v) => {
+									this.map[String(key)] = v
+									resolve(v)
+								})
+								.catch((err) => {
 									console.log(err)
 									resolve(false)
 								})
-						} else {
-							WebStorage.model
-								.Update(
-									{
-										label: {
-											$value: this.label,
-										},
-										key: {
-											$value: k,
-										},
-									},
-									{
-										data: vObj.toString(),
-										options: JSON.stringify({
-											// v: {
-											// 	expiration: expiration ? expiration * 1000 : -1,
-											// },
-										}),
-									}
-								)
-								.then((res: any) => {
-									this.map[k] = vObj.toJson()
-									resolve(true)
+							break
+						case 'LocalStorage':
+							resolve(this.setSync(key, value, expiration))
+							break
+						case 'IndexedDB':
+							const k = this.getKey(key)
+							const getValue = await this.get(key)
+							const vObj = this.getValue(value, expiration * 1000)
+							// console.log('vObj', k, vObj, getValue)
+							if (typeof key === 'string') {
+							}
+							if (!getValue) {
+								new WebStorage.model({
+									key: k,
+									data: vObj.toString(),
+									options: JSON.stringify({
+										// v: {
+										// 	expiration: expiration ? expiration * 1000 : -1,
+										// },
+									}),
+									label: this.label,
 								})
-								.catch((err: any) => {
-									resolve(false)
-								})
-						}
-						break
-					// throw 'IndexedDB does not support synchronous functions'
+									.Save()
+									.then((res) => {
+										this.map[k] = vObj.toJson()
+										resolve(true)
+									})
+									.catch((err: any) => {
+										console.log(err)
+										resolve(false)
+									})
+							} else {
+								WebStorage.model
+									.Update(
+										{
+											label: {
+												$value: this.label,
+											},
+											key: {
+												$value: k,
+											},
+										},
+										{
+											data: vObj.toString(),
+											options: JSON.stringify({
+												// v: {
+												// 	expiration: expiration ? expiration * 1000 : -1,
+												// },
+											}),
+										}
+									)
+									.then((res: any) => {
+										this.map[k] = vObj.toJson()
+										resolve(true)
+									})
+									.catch((err: any) => {
+										resolve(false)
+									})
+							}
+							break
+						// throw 'IndexedDB does not support synchronous functions'
 
-					default:
-						break
+						default:
+							break
+					}
+				} catch (error) {
+					console.error(error)
+					return reject(this.undefinedValue())
 				}
-			} catch (error) {
-				console.error(error)
-				return reject(this.undefinedValue())
-			}
+			}, 'set' + key)
 		})
 	}
 	public setSync(key: K, value: T, expiration: number = 0): boolean {

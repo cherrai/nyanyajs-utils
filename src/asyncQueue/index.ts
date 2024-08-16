@@ -1,6 +1,7 @@
 // 一个一个的走
-export interface RunQueueOptions {}
-export class RunQueue {
+export interface AsyncQueueOptions {}
+// 曾经叫RunQueue
+export class AsyncQueue {
 	private count: number = 0
 	private queue: {
 		key: string
@@ -8,7 +9,7 @@ export class RunQueue {
 		func: () => Promise<void>
 		callback: () => Promise<void>
 	}[] = []
-	constructor(optins?: RunQueueOptions) {}
+	constructor(optins?: AsyncQueueOptions) {}
 	public increase(func: () => Promise<void>, key: string) {
 		this.count++
 		this.queue.push({
@@ -26,8 +27,8 @@ export class RunQueue {
 				}
 				await this.queue[0].callback()
 			},
-    })
-    console.log("this.queue.length === 1",this.queue.length === 1)
+		})
+		// console.log('this.queue.length === 1', this.queue.length === 1)
 		if (this.queue.length === 1) {
 			this.queue[0].callback().then()
 		}

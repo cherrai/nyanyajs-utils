@@ -27,3 +27,4 @@ dist/
 tmp/
 
 package-lock.json
+yarn-error.log

@@ -91,7 +91,9 @@ export interface ChunkUploadTokenInfo {
 	}
 }
 
-export class SAaSS extends NEventListener<'AppTokenInvalid'> {
+export class SAaSS extends NEventListener<{
+	AppTokenInvalid: SAaSS
+}> {
 	private baseUrl: string = ''
 	private appToken: string = ''
 	private appTokenDeadline: number = 0
@@ -154,7 +156,7 @@ export class SAaSS extends NEventListener<'AppTokenInvalid'> {
 		this.timer = setTimeout(() => {
 			this.wait.revoke()
 			this.appToken = ''
-			this.dispatch('AppTokenInvalid')
+			this.dispatch('AppTokenInvalid', this)
 		}, (deadline - 5) * 1000 - new Date().getTime())
 		this.wait.dispatch()
 		this.wait.dispatch('baseUrl')

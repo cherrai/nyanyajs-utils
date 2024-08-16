@@ -1,5 +1,5 @@
-import { random, getRandomNum } from './commmon'
 import BigNumber from 'big-number'
+import { getRandomNum } from '../nnumber'
 
 BigNumber.prototype.clean = function () {
 	// used to make the value of BigNumber()'s more eye friendly

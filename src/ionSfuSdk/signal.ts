@@ -6,7 +6,11 @@ import { UserAgent, userAgent } from '../userAgent'
 import { ClientInfo } from './types'
 import { NEventListener, Wait } from '..'
 
-export class SFUSignal extends NEventListener<'open' | 'close' | 'error'> {
+export class SFUSignal extends NEventListener<{
+	open: any
+	close: any
+	error: any
+}> {
 	signal?: IonSFUJSONRPCSignal
 	uri: string
 	token: string
@@ -67,7 +71,7 @@ export class SFUSignal extends NEventListener<'open' | 'close' | 'error'> {
 		this.signal.onopen = () => {
 			// console.log('onopen')
 			this.openWait.dispatch()
-			this.dispatch('open')
+			this.dispatch('open', this)
 			// this.createDataChannel()
 		}
 		this.signal.onclose = (e) => {

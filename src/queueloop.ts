@@ -1,4 +1,4 @@
-// 时间队列
+// 时间队列, 实际上就是节流函数
 export class QueueLoop {
 	global: boolean = false
 	delayms: number = 1000

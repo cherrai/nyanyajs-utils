@@ -8,9 +8,19 @@ import {
 	RouterFunc,
 	RoomClientsItem,
 	ClientInfo,
+	FileInfo,
 } from './types'
-import { Debounce, QueueLoop, Wait } from '..'
+import {
+	Debounce,
+	NEventListener,
+	QueueLoop,
+	SAaSS,
+	Wait,
+	file as nfile,
+} from '..'
 import { SFUSignal } from './signal'
+import { getHash } from '../file'
+const CryptoJS = require('crypto-js')
 
 // import { formatConstraints, getMediaDevices } from './methods'
 
@@ -19,6 +29,37 @@ import { SFUSignal } from './signal'
 // 	.then((stream) => {
 // 		console.log('screenStream', stream)
 // 	})
+
+function ArrayBufferToString(buf: ArrayBuffer) {
+	return String.fromCharCode.apply(null, new Uint16Array(buf) as any)
+}
+function StringToArrayBuffer(str: string) {
+	var buf = new ArrayBuffer(str.length * 2)
+	var bufView = new Uint16Array(buf)
+	for (var i = 0, strLen = str.length; i < strLen; i++) {
+		bufView[i] = str.charCodeAt(i)
+	}
+	return buf
+}
+function ConcatArrayBuffer(...arrays: ArrayBuffer[]) {
+	let totalLen = 0
+
+	for (let arr of arrays) totalLen += arr.byteLength
+
+	let res = new Uint8Array(totalLen)
+
+	let offset = 0
+
+	for (let arr of arrays) {
+		let uint8Arr = new Uint8Array(arr)
+
+		res.set(uint8Arr, offset)
+
+		offset += arr.byteLength
+	}
+
+	return res.buffer
+}
 
 export class SFUClient extends EventTarget {
 	d = new Debounce()
@@ -158,6 +199,7 @@ export class SFUClient extends EventTarget {
 					publishStream: false,
 					dc: e.channel,
 				}
+
 				e.channel.onclose = (e) => {
 					console.log('sfu datachannel sub onclose', e)
 				}
@@ -552,14 +594,20 @@ export class SFUClient extends EventTarget {
 			// 	this.roomClients[clientId]?.dc?.readyState
 			// )
 			if (this.roomClients[clientId]?.dc?.readyState === 'open') {
-				this.roomClients[clientId]?.dc?.send(
-					JSON.stringify({
-						eventName: eventName,
-						requestId: requestId,
-						clientInfo: this.clientInfo,
-						data: data,
-					})
-				)
+				const msg = JSON.stringify({
+					eventName: eventName,
+					requestId: requestId,
+					clientInfo: this.clientInfo,
+					data: data,
+				})
+				// console.log(msg.length)
+				// var buf = new ArrayBuffer(msg.length*2) // 2 bytes for each char
+				// var bufView = new Uint16Array(buf)
+				// for (var i = 0, strLen = msg.length; i < strLen; i++) {
+				// 	bufView[i] = msg.charCodeAt(i)
+				// }
+
+				this.roomClients[clientId]?.dc?.send(msg)
 			}
 		}
 
@@ -624,18 +672,18 @@ export class SFUClient extends EventTarget {
 								}
 							}
 						}
-						console.log(
-							'sfutest emit 发送',
-							!options?.onlySend,
-							!this.roomClients[clientId]?.dc,
-							this.roomClients[clientId]?.dc,
-							{
-								eventName: eventName,
-								clientInfo: this.clientInfo,
-								data: data,
-							},
-							this.requests
-						)
+						// console.log(
+						// 	'sfutest emit 发送',
+						// 	!options?.onlySend,
+						// 	!this.roomClients[clientId]?.dc,
+						// 	this.roomClients[clientId]?.dc,
+						// 	{
+						// 		eventName: eventName,
+						// 		clientInfo: this.clientInfo,
+						// 		data: data,
+						// 	},
+						// 	this.requests
+						// )
 						if (clientId && this.roomClients[clientId]?.dc) {
 							send(eventName, clientId, requestId, data)
 						}
@@ -678,25 +726,232 @@ export class SFUClient extends EventTarget {
 					},
 				}
 			},
-			sendFile: (
+			sendFile: async (
 				clientId: string,
-				data: File,
+				file: File,
 				event?: {
-					oncreated?: () => void
+					oncreated?: (fileInfo: FileInfo) => boolean
 					onreceiving?: () => void
-					onsending?: () => void
-					onsuccess?: () => void
+					onsending?: (fileInfo: FileInfo, uploadedSize: number) => void
+					onsuccess?: (fileInfo: FileInfo) => void
 					onabort?: () => void
-					onerror?: () => void
+					onerror?: (err: Error) => void
 				}
 			) => {
-				const fileReader = new FileReader()
+				console.log(clientId)
+				let isAbort = false
 				let offset = 0
-				// this.fileQueue[]
-				return {}
+				let chunkSize = 60 * 1024
+				let width = 0
+				let height = 0
+
+				try {
+					const fi = await nfile.getFileInfo(file)
+					if (fi) {
+						const fileInfo: FileInfo = {
+							id: md5(fi.hash),
+							chunkSize: chunkSize,
+							...fi,
+						}
+						if (event?.oncreated?.(fileInfo)) {
+							api
+								.to({
+									clientId,
+								})
+								.emit('file-oncreated', fileInfo)
+
+							const reader = new FileReader()
+							reader.onload = async (e) => {
+								if (!e.target?.result || isAbort) {
+									event?.onabort?.()
+									return
+								}
+
+								// console.log(options, offset, offset + chunkSize)
+								const result: any = e.target?.result
+
+								const blob = new Blob(
+									[e.target.result],
+									{}
+									// encodeURIComponent(
+									// 	JSON.stringify({
+									// 		offset: offset.toString(),
+									// 		hash: hash,
+									// 		// 有问题
+									// 		final: e.total + offset === file.size ? 'ok' : 'no',
+									// 	})
+									// )
+								)
+								const buf = new ArrayBuffer(64)
+								const str = new TextDecoder().decode(buf)
+								// console.log(
+								// 	'onsending1',
+								// 	// (e.target.result as string).length,
+								// 	// blob,
+								// 	file.size,
+								// 	offset,
+								// 	chunkSize
+								// )
+
+								// ArrayBufferToString(
+								//   arrayBuffer.slice(blob.size, blob.size + strbf.byteLength)
+								// )
+								offset += chunkSize
+
+								// const offsetAB = StringToArrayBuffer(
+								// 	String(offset > file.size ? file.size : offset).padStart(5, '0')
+								// )
+
+								const sizeAB = StringToArrayBuffer(
+									String(blob.size).padStart(5, '0')
+								)
+
+								const hashAB = StringToArrayBuffer(
+									JSON.stringify({
+										hash: fi.hash,
+										offset: offset > file.size ? file.size : offset,
+									})
+								)
+								// console.log('onsending1', hash, strbf, e.target.result)
+								// console.log(
+								// 	String(offset > file.size ? file.size : offset).padStart(
+								// 		12,
+								// 		'0'
+								// 	),
+								// 	sizeAB,
+								// 	offsetAB,
+								// 	hashAB
+								// )
+								const arrayBuffer = ConcatArrayBuffer(
+									e.target.result as any,
+									hashAB,
+									sizeAB
+								)
+
+								event?.onsending?.(
+									fileInfo,
+									offset > file.size ? file.size : offset
+								)
+								// api.send(clientId, e.target.result)
+								// api.send(clientId, { file: e.target.result })
+								// api.send(clientId, blob)
+								api.send(clientId, arrayBuffer)
+
+								// new RTCDataChannel.Buffer(ByteBuffer.wrap(msg), false);
+
+								// api
+								// 	.to({
+								// 		clientId,
+								// 	})
+								// 	.emit('file-onreceiving', {
+								// 		chunk: e.target.result,
+								// 		hash: hash,
+								// 		offset: offset > file.size ? file.size : offset,
+								// 	})
+								if (offset > file.size) {
+									event?.onsuccess?.(fileInfo)
+
+									return
+								}
+
+								reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize))
+							}
+							reader.readAsArrayBuffer(file.slice(offset, offset + chunkSize))
+						}
+					}
+				} catch (error) {
+					event?.onerror?.(error as Error)
+				}
+
+				return {
+					abort: () => {
+						isAbort = true
+					},
+				}
+			},
+			receiveFile: (event?: {
+				oncreated?: (fileInfo: FileInfo, clientInfo: ClientInfo) => void
+				onreceiving?: (fileInfo: FileInfo, uploadedSize: number) => void
+				onsuccess?: (fileInfo: FileInfo, file: File) => void
+				onabort?: () => void
+				onerror?: (error: Error) => void
+			}) => {
+				let isAbort = false
+
+				const files: {
+					[hash: string]: {
+						receiveBuffer: ArrayBuffer[]
+						// 0 / 1
+						status: number
+						fileInfo: FileInfo
+					}
+				} = {}
+				try {
+					const onSuccess = (hash: string) => {
+						const file = files[hash]
+						console.log('fileonsuccess', files[hash], files)
+						files[hash].status = 1
+						// delete files[data.data.hash]
+						// 创建文件
+						const received = new File(
+							[
+								new Blob(file.receiveBuffer, {
+									type: file.fileInfo.type,
+								}),
+							],
+							file.fileInfo.name,
+							{
+								type: file.fileInfo.type,
+								lastModified: file.fileInfo.lastModified,
+							}
+						)
+						event?.onsuccess?.(file.fileInfo, received)
+					}
+					api.router('file-oncreated', (data) => {
+						if (files[data.data.hash]?.status === 1) {
+							onSuccess(data.data.hash)
+							return
+						}
+						files[data.data.hash] = {
+							fileInfo: data.data,
+							status: 0,
+							receiveBuffer: [],
+						}
+						console.log('file-oncreated', data.data, files[data.data.hash])
+						event?.oncreated?.(data.data, data.clientInfo)
+					})
+
+					api.router('file-onreceiving', (data) => {
+						console.log('file-onreceiving', data, files)
+						files[data.data.hash].receiveBuffer.push(data.data.chunk)
+
+						const file = files[data.data.hash]
+
+						event?.onreceiving?.(file.fileInfo, data.data.offset)
+
+						if (data.data.offset === file.fileInfo.size) {
+							onSuccess(data.data.hash)
+						}
+						// event?.onreceiving?.(data.data, data.clientInfo)
+					})
+				} catch (error) {
+					event?.onerror?.(error as Error)
+				}
+				return {
+					// 预留
+					abort: () => {
+						isAbort = true
+					},
+				}
 			},
 			send: (clientId: string, data: any) => {
-				// console.log(clientId, this.roomClients, this.dc, data)
+				// console.log(
+				// 	clientId,
+				// 	this.roomClients,
+				// 	this.roomClients[clientId],
+				// 	this.dc,
+				// 	data.length
+				// )
 				this.roomClients[clientId]?.dc?.send(data)
 			},
 			// 发送给所有人就不要带自己的clientId
@@ -742,6 +997,7 @@ export class SFUClient extends EventTarget {
 					send(eventName, id, requestId, data)
 				})
 			},
+			// 不能多次调用
 			router: (eventName: string, func: RouterFunc) => {
 				this.routers[eventName] = (reqData) => {
 					func(reqData, {
@@ -909,6 +1165,7 @@ export class SFUClient extends EventTarget {
 		)
 		console.log('createDataChannel', this.dc)
 		// this.dc.binaryType = 'arraybuffer'
+		console.log(this.dc.bufferedAmount)
 		this.DATAChannelInitStatus = true
 		const { router, emit, to } = this.DataChannelAPI()
 		// init
@@ -919,6 +1176,10 @@ export class SFUClient extends EventTarget {
 		}
 		// let receiveBuffer = []
 		this.dc.onmessage = async (message) => {
+			// console.log('onmessage', message, message.data)
+			// console.log(String.fromCharCode.apply(null, message.data as any))
+			// file-oncreated
+
 			// receiveBuffer.push(message.data)
 			// // console.log(
 			// // 	'dcmessage',
@@ -953,24 +1214,64 @@ export class SFUClient extends EventTarget {
 			// 	return
 			// }
 			// return
-			const data: DATAChannelRouterResponse = JSON.parse(message.data)
-			if (this.clientInfo.roomId == data?.clientInfo?.roomId) {
-				if (
-					this.requests[data.clientInfo.clientId] &&
-					this.requests[data.clientInfo.clientId][data.eventName] &&
-					this.requests[data.clientInfo.clientId][data.eventName][
-						data?.requestId
-					] &&
-					this.requests[data.clientInfo.clientId][data.eventName][
-						data?.requestId
-					].returnValue
-				) {
-					this.requests[data.clientInfo.clientId][data.eventName][
-						data?.requestId
-					]?.response?.func?.(data)
-				} else {
-					this.routers[data.eventName] && this.routers[data.eventName](data)
+
+			// console.log(message.data instanceof ArrayBuffer)
+			if (message.data instanceof ArrayBuffer) {
+				// console.log(message.data.byteLength)
+				const size = Number(
+					ArrayBufferToString(
+						message.data.slice(
+							message.data.byteLength - 10,
+							message.data.byteLength
+						)
+					)
+				)
+				// console.log(
+				// 	ArrayBufferToString(
+				// 		message.data.slice(size, message.data.byteLength - 10)
+				// 	)
+				// )
+				const infoObj: any = JSON.parse(
+					ArrayBufferToString(
+						message.data.slice(size, message.data.byteLength - 10)
+					)
+				)
+
+				// console.log(this.routers, infoObj, this.requests)
+				// this.requests[message.clientInfo.clientId][data.eventName][
+				// 	data?.requestId
+				// ]?.response?.func?.(data)
+				this.routers['file-onreceiving']?.({
+					data: {
+						chunk: message.data.slice(0, size),
+						hash: infoObj['hash'],
+						offset: infoObj['offset'],
+					},
+				} as any)
+				return
+			}
+			try {
+				const data: DATAChannelRouterResponse = JSON.parse(message.data)
+				if (this.clientInfo.roomId == data?.clientInfo?.roomId) {
+					if (
+						this.requests[data.clientInfo.clientId] &&
+						this.requests[data.clientInfo.clientId][data.eventName] &&
+						this.requests[data.clientInfo.clientId][data.eventName][
+							data?.requestId
+						] &&
+						this.requests[data.clientInfo.clientId][data.eventName][
+							data?.requestId
+						].returnValue
+					) {
+						this.requests[data.clientInfo.clientId][data.eventName][
+							data?.requestId
+						]?.response?.func?.(data)
+					} else {
+						this.routers[data.eventName] && this.routers[data.eventName](data)
+					}
 				}
+			} catch (error) {
+				console.error(error)
 			}
 		}
 		this.dc.onopen = async () => {

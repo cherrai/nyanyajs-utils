@@ -8,8 +8,9 @@
 		// macos
 		// "outDir": "../../MetahorizonLab/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
 		// windows11
-    // "outDir":"../../shiina_aiiko/meow-backups/web/node_modules/@nyanyajs/utils/dist",
-    "outDir":"../../shiina_aiiko/meow-cloud-sharing/node_modules/@nyanyajs/utils/dist",
+		// "outDir":"../../game/killer-sudoku-nya/node_modules/@nyanyajs/utils/dist",
+		// "outDir":"../../shiina_aiiko/meow-backups/web/node_modules/@nyanyajs/utils/dist",
+		// "outDir":"../../shiina_aiiko/meow-cloud-sharing/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/electron/node_modules/@nyanyajs/utils/dist",
 		// "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
@@ -25,7 +26,7 @@
 		// "outDir": "./examples/react/node_modules/@nyanyajs/nyanyadb",
 		// "outDir": "./examples/demo/src/nyanyadb",
 		// "outFile": "./examples/demo/src/nyanyadb.js",
-		// "outDir": "./dist",
+		"outDir": "./dist",
 		"rootDir": "./src",
 		"allowJs": false,
 		"declaration": true,
@@ -36,7 +37,7 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"watch": true
 	},
-	"include": ["src"]
+	"include": ["src"],
+	"exclude": ["src/webAssembly/go-wasm"]
 }
