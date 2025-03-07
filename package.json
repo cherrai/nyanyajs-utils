@@ -1,6 +1,6 @@
 {
 	"name": "@nyanyajs/utils",
-	"version": "1.0.22",
+	"version": "1.0.27",
 	"description": "nyanyajs/utils",
 	"main": "./dist/index.js",
 	"scripts": {
@@ -9,7 +9,7 @@
 		"build": "yarn cpWasmJS && tsc --watch",
 		"dev": "tsc --watch",
 		"pub": "npm publish --registry https://registry.npm.aiiko.club",
-		"unpub": "npm unpublish @nyanyajs/utils@1.0.21 --registry https://registry.npm.aiiko.club"
+		"unpub": "npm unpublish @nyanyajs/utils@1.0.27 --registry https://registry.npm.aiiko.club"
 	},
 	"author": "shiina_aiiko",
 	"repository": {
@@ -34,7 +34,7 @@
 		"jsrsasign": "^10.5.1",
 		"nyanyajs-log": "^1.0.11",
 		"qs": "^6.11.0",
-		"socket.io-client": "2.4.0",
+		"socket.io-client": "2.5.0",
 		"ua-parser-js": "^1.0.2",
 		"uuid": "^9.0.1"
 	},

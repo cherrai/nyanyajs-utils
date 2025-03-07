@@ -1,6 +1,6 @@
 // import { NEventListener } from '@nyanyajs/utils'
 import { NWebRTCClient } from './client'
-import { NEventListener } from './neventListener'
+import { NEventListener } from '../common/neventListener'
 import {
 	ConcatArrayBuffer,
 	StringToArrayBuffer,
