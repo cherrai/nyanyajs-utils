@@ -1,43 +1,50 @@
 {
-	"compilerOptions": {
-		"target": "es2015",
-		"lib": ["es2015", "dom", "ES2020"],
-		"module": "commonjs",
-		"experimentalDecorators": true,
-
-		// macos
-		// "outDir": "../../MetahorizonLab/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
-		// windows11
-		// "outDir":"../../game/killer-sudoku-nya/node_modules/@nyanyajs/utils/dist",
-		// "outDir":"../../shiina_aiiko/meow-backups/web/node_modules/@nyanyajs/utils/dist",
-		// "outDir":"../../shiina_aiiko/meow-cloud-sharing/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/electron/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
-		"outDir": "../../meow-sticky-note/meow-sticky-note-client/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../nyanya/nyanya-toolbox/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../saki-ui/saki-ui/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
-
-		// "outDir": "../../MetahorizonLab/saki-ui/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../MetahorizonLab/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "../../MetahorizonLab/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
-		// "outDir": "./examples/react/node_modules/@nyanyajs/nyanyadb",
-		// "outDir": "./examples/demo/src/nyanyadb",
-		// "outFile": "./examples/demo/src/nyanyadb.js",
-		// "outDir": "./dist",
-		"rootDir": "./src",
-		"allowJs": false,
-		"declaration": true,
-		// 不允许隐式的 any 类型
-		"removeComments": true,
-		"moduleResolution": "node",
-		"types": [],
-		"esModuleInterop": true,
-		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true,
-	},
-	"include": ["src"],
-	"exclude": ["src/webAssembly/go-wasm"]
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": [
+      "es2015",
+      "dom",
+      "ES2020"
+    ],
+    "module": "commonjs",
+    "experimentalDecorators": true,
+    // macos
+    // "outDir": "../../MetahorizonLab/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
+    // windows11
+    // "outDir":"../../game/killer-sudoku-nya/node_modules/@nyanyajs/utils/dist",
+    // "outDir":"../../shiina_aiiko/meow-backups/web/node_modules/@nyanyajs/utils/dist",
+    // "outDir":"../../shiina_aiiko/meow-cloud-sharing/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/electron/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../meow-sticky-note/meow-sticky-note-client/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../nyanya/nyanya-toolbox/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../nyanya/nyanya-trip-route-track/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../saki-ui/saki-ui/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../cherrai/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../cherrai/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../MetahorizonLab/saki-ui/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../MetahorizonLab/saki-sso/saki-sso-client/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../MetahorizonLab/saki-sso/saki-sso-server/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "./examples/react/node_modules/@nyanyajs/nyanyadb",
+    // "outDir": "./examples/demo/src/nyanyadb",
+    // "outFile": "./examples/demo/src/nyanyadb.js",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "allowJs": false,
+    "declaration": true,
+    // 不允许隐式的 any 类型
+    "removeComments": true,
+    "moduleResolution": "node",
+    "types": [],
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "src/webAssembly/go-wasm"
+  ]
 }

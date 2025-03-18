@@ -1,6 +1,6 @@
 {
 	"name": "@nyanyajs/utils",
-	"version": "1.0.27",
+	"version": "1.0.33",
 	"description": "nyanyajs/utils",
 	"main": "./dist/index.js",
 	"scripts": {
@@ -9,7 +9,7 @@
 		"build": "yarn cpWasmJS && tsc --watch",
 		"dev": "tsc --watch",
 		"pub": "npm publish --registry https://registry.npm.aiiko.club",
-		"unpub": "npm unpublish @nyanyajs/utils@1.0.27 --registry https://registry.npm.aiiko.club"
+		"unpub": "npm unpublish @nyanyajs/utils@1.0.32 --registry https://registry.npm.aiiko.club"
 	},
 	"author": "shiina_aiiko",
 	"repository": {
@@ -22,7 +22,7 @@
 	},
 	"homepage": "https://github.com/ShiinaAiiko/nyanyajs-utils#readme",
 	"dependencies": {
-		"@nyanyajs/nyanyadb": "^1.0.4",
+		"@nyanyajs/nyanyadb": "^1.0.5",
 		"axios": "^0.27.2",
 		"big-number": "^2.0.0",
 		"blueimp-md5": "^2.19.0",

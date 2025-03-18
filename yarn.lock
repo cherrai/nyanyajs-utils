@@ -37,10 +37,10 @@
   resolved "https://registry.npmmirror.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
-"@nyanyajs/nyanyadb@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.npm.aiiko.club/@nyanyajs/nyanyadb/-/nyanyadb-1.0.4.tgz#e8fb2c4281132928174859433c8ff6a68fc0ba61"
-  integrity sha512-CfXi7DyAjfKf0L1D0xBJxwcr0P4/Hzv5Ku7rD9eWx5QfCLQdsjPe/G0ugTSbxubeHo2E6Ft2UQKq/5KvQWcP0A==
+"@nyanyajs/nyanyadb@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.npm.aiiko.club/@nyanyajs/nyanyadb/-/nyanyadb-1.0.5.tgz#a1fc65b6f8b5d2a10f00c72dfe6b498e5aa24866"
+  integrity sha512-39jRem3KkEHEyL6I1qzKLl6ejEUtp29Cf+ZOUkWviGTv9LVt0lVmSAX7SbySRyYwT2k0RxOjRC7KcEbFl8EvhA==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
