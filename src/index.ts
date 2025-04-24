@@ -32,6 +32,7 @@ import { compareUnicodeOrder, getInitials } from './nstring/common'
 import { WebWorker } from './webWorker'
 import { getShortId, getRandomStringInSpecifiedRange } from './shortId'
 import { NWebRTC } from './nwebrtc'
+import { swapSort } from './narray'
 
 export {
   Debounce,
@@ -66,7 +67,8 @@ export {
   WebWorker,
   getShortId,
   getRandomStringInSpecifiedRange,
-  NWebRTC, imageColorInversion, deepMergeObject
+  NWebRTC, imageColorInversion, deepMergeObject, swapSort
+
   // NetworkStatus,
   // NodeFsStorage,
 }
@@ -104,7 +106,7 @@ export default {
   WebWorker,
   getShortId,
   getRandomStringInSpecifiedRange,
-  NWebRTC, imageColorInversion, deepMergeObject
+  NWebRTC, imageColorInversion, deepMergeObject, swapSort
   // NetworkStatus,
   // NodeFsStorage,
 }
