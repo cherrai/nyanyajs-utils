@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2015",
-    "lib": [
-      "es2015",
-      "dom",
-      "ES2020"
-    ],
+    "lib": ["es2015", "dom", "ES2020"],
     "module": "commonjs",
     "experimentalDecorators": true,
     // macos
@@ -39,12 +35,8 @@
     "types": [],
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "src/webAssembly/go-wasm"
-  ]
+  "include": ["src"],
+  "exclude": ["src/webAssembly/go-wasm"]
 }

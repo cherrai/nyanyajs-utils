@@ -23,7 +23,13 @@ import {
 } from './cipher'
 import { SAaSS } from './saass'
 import { SakiSSOClient } from './sakisso'
-import { deepCopy, NetworkStatus, byteConvert } from './common/common'
+import {
+  deepCopy,
+  NetworkStatus,
+  byteConvert,
+  networkConnectionStatusDetection,
+  networkConnectionStatusDetectionEnum,
+} from './common/common'
 import { Wait } from './common/wait'
 import { validation } from './validation'
 import { NyaNyaWasm } from './webAssembly'
@@ -33,6 +39,7 @@ import { WebWorker } from './webWorker'
 import { getShortId, getRandomStringInSpecifiedRange } from './shortId'
 import { NWebRTC } from './nwebrtc'
 import { swapSort } from './narray'
+import units from './units'
 
 export {
   Debounce,
@@ -67,7 +74,10 @@ export {
   WebWorker,
   getShortId,
   getRandomStringInSpecifiedRange,
-  NWebRTC, imageColorInversion, deepMergeObject, swapSort
+  NWebRTC,
+  imageColorInversion,
+  deepMergeObject,
+  swapSort,
 
   // NetworkStatus,
   // NodeFsStorage,
@@ -106,7 +116,13 @@ export default {
   WebWorker,
   getShortId,
   getRandomStringInSpecifiedRange,
-  NWebRTC, imageColorInversion, deepMergeObject, swapSort
+  NWebRTC,
+  imageColorInversion,
+  deepMergeObject,
+  swapSort,
+  networkConnectionStatusDetection,
+  networkConnectionStatusDetectionEnum,
+  units,
   // NetworkStatus,
   // NodeFsStorage,
 }

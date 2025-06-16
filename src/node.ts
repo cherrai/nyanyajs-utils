@@ -20,7 +20,12 @@ import {
 } from './cipher'
 // import SAaSS from './saass'
 // import { SakiSSOClient } from './sakisso'
-import { deepCopy, NetworkStatus } from './common/common'
+import {
+  deepCopy,
+  networkConnectionStatusDetection,
+  networkConnectionStatusDetectionEnum,
+  NetworkStatus,
+} from './common/common'
 import { NEventListener } from './common/neventListener'
 import { compareUnicodeOrder, getInitials } from './nstring/common'
 
@@ -30,6 +35,7 @@ import { electronRouter } from './webStorage/electronRouter'
 import { getShortId, getRandomStringInSpecifiedRange } from './shortId'
 
 import { deepMergeObject } from './nobject'
+import units from './units'
 
 export {
   Debounce,
@@ -50,7 +56,8 @@ export {
   deepCopy,
   AsyncQueue,
   getShortId,
-  getRandomStringInSpecifiedRange, deepMergeObject
+  getRandomStringInSpecifiedRange,
+  deepMergeObject,
 }
 
 export default {
@@ -72,5 +79,9 @@ export default {
   deepCopy,
   AsyncQueue,
   getShortId,
-  getRandomStringInSpecifiedRange, deepMergeObject
+  getRandomStringInSpecifiedRange,
+  deepMergeObject,
+  networkConnectionStatusDetection,
+  networkConnectionStatusDetectionEnum,
+  units,
 }

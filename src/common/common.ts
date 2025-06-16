@@ -65,3 +65,23 @@ export const byteConvert = (bytes: number) => {
   }
   return bstr + ' ' + symbols[i]
 }
+
+let connectionStatus: Record<string, boolean> = {}
+
+export const networkConnectionStatusDetectionEnum = {
+  openMeteo: 'https://api.open-meteo.com/v1/forecast',
+  airQualityAPI: 'https://air-quality-api.open-meteo.com/v1/air-quality',
+  openStreetMap: 'https://nominatim.openstreetmap.org/search?q=&format=jsonv2',
+}
+
+export const networkConnectionStatusDetection = async (url: string) => {
+  try {
+    if (!url) return false
+    if (connectionStatus[url] === undefined) {
+      connectionStatus[url] = (await fetch(url))?.status === 200
+    }
+  } catch (error) {
+    connectionStatus[url] = false
+  }
+  return connectionStatus[url]
+}
