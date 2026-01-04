@@ -6,7 +6,7 @@ export class Wait {
     }
   } = {}
   async waiting(key: string = 'wait') {
-    this.revoke(key)
+    // this.revoke(key)
     return new Promise((res) => {
       !this.handlers[key] &&
         (this.handlers[key] = {
@@ -28,7 +28,6 @@ export class Wait {
         status: 0,
         fl: [],
       })
-    console.log(this.handlers)
     this.handlers[key].status = 1
     this.handlers[key].fl.forEach((v) => {
       v()
@@ -38,7 +37,6 @@ export class Wait {
   revoke(key: string = 'wait') {
     if (this.handlers[key]) {
       this.handlers[key].status = 0
-
     }
   }
 }

@@ -74,14 +74,34 @@ export const networkConnectionStatusDetectionEnum = {
   openStreetMap: 'https://nominatim.openstreetmap.org/search?q=&format=jsonv2',
 }
 
-export const networkConnectionStatusDetection = async (url: string) => {
-  try {
-    if (!url) return false
-    if (connectionStatus[url] === undefined) {
-      connectionStatus[url] = (await fetch(url))?.status === 200
-    }
-  } catch (error) {
-    connectionStatus[url] = false
+export const networkConnectionStatusDetection = (
+  url: string,
+  options?: {
+    timeout?: number
   }
-  return connectionStatus[url]
+) => {
+  return new Promise(async (res, rej) => {
+    if (!url) return false
+    if (connectionStatus[url]) {
+      return res(true)
+    }
+
+    try {
+      if (connectionStatus[url] === undefined) {
+        setTimeout(() => {
+          if (!connectionStatus[url]) {
+            connectionStatus[url] = false
+            res(false)
+            return
+          }
+          res(connectionStatus[url])
+        }, options?.timeout || 3000)
+
+        connectionStatus[url] = (await fetch(url))?.status === 200
+      }
+    } catch (error) {
+      connectionStatus[url] = false
+    }
+    res(connectionStatus[url])
+  })
 }

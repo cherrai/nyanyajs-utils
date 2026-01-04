@@ -9,9 +9,10 @@
     // windows11
     // "outDir":"../../game/killer-sudoku-nya/node_modules/@nyanyajs/utils/dist",
     // "outDir":"../../shiina_aiiko/meow-backups/web/node_modules/@nyanyajs/utils/dist",
-    // "outDir":"../../shiina_aiiko/meow-cloud-sharing/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../shiina_aiiko/meow-cloud-sharing/node_modules/@nyanyajs/utils/dist",
     // "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/node_modules/@nyanyajs/utils/dist",
     // "outDir": "../../shiina_aiiko/meow-whisper-core/example/meow-whisper-core-web-chat-demo/electron/node_modules/@nyanyajs/utils/dist",
+    // "outDir": "../../shiina_aiiko/shiina-aiiko-blog/shiina-aiiko-blog-client-ssr/node_modules/@nyanyajs/utils/dist",
     // "outDir": "../../cherrai/meow-whisper/meow-whisper-web-client/node_modules/@nyanyajs/utils/dist",
     // "outDir": "../../meow-sticky-note/meow-sticky-note-client/node_modules/@nyanyajs/utils/dist",
     // "outDir": "../../nyanya/nyanya-toolbox/node_modules/@nyanyajs/utils/dist",

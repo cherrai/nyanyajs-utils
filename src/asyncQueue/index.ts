@@ -1,5 +1,5 @@
-import { Wait } from "../common/wait"
-import { Debounce } from "../debounce"
+import { Wait } from '../common/wait'
+import { Debounce } from '../debounce'
 
 // import { Debounce } from "@nyanyajs/utils";
 // import { Wait } from "./wait"
@@ -11,15 +11,12 @@ export interface AsyncQueueOptions {
 }
 // 曾经叫RunQueue
 export class AsyncQueue {
-
   private maxQueueConcurrency = 0
   private runInterval = 0
   private runningCount = 0
 
-
   public wait: Wait
   private d: Debounce
-
 
   private queue: {
     func: () => Promise<any>
@@ -32,18 +29,20 @@ export class AsyncQueue {
     this.d = new Debounce()
 
     // console.log("getAllTripPositions new aq", this)
-
   }
 
   private async runNext() {
-    if (this.runningCount >= this.maxQueueConcurrency || this.queue.length === 0) {
-
+    if (
+      this.runningCount >= this.maxQueueConcurrency ||
+      this.queue.length === 0
+    ) {
       // console.log("getAllTripPositions this.queue.length === 0 && this.runningCount === 0",
       //   this.queue.length, this.runningCount,
       //   this.queue.length === 0 && this.runningCount === 0)
       if (this.queue.length === 0 && this.runningCount === 0) {
         this.d.increase(() => {
           this.wait.dispatch()
+          this.wait.revoke()
           // console.log("getAllTripPositions allRes",)
         }, 100)
       }
@@ -51,15 +50,15 @@ export class AsyncQueue {
       return
     }
 
-    const nextTask = this.queue.shift();
+    const nextTask = this.queue.shift()
 
-    if (!nextTask) return;
+    if (!nextTask) return
 
-    this.runningCount++;
+    this.runningCount++
     try {
-      await nextTask.func();
+      await nextTask.func()
     } finally {
-      this.runningCount--;
+      this.runningCount--
       this.run()
     }
   }
@@ -67,18 +66,17 @@ export class AsyncQueue {
   private run() {
     if (this.runInterval) {
       setTimeout(() => {
-        this.runNext();
-      }, this.runInterval);
+        this.runNext()
+      }, this.runInterval)
     } else {
-      this.runNext();
+      this.runNext()
     }
-
   }
 
   public increase(func: () => Promise<any>) {
     this.queue.push({
       func,
-    });
+    })
 
     this.run()
   }
