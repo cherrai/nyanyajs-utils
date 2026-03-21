@@ -10,14 +10,7 @@ import {
   ClientInfo,
   FileInfo,
 } from './types'
-import {
-  Debounce,
-  NEventListener,
-  QueueLoop,
-  SAaSS,
-  Wait,
-  file as nfile,
-} from '..'
+import { Debounce, NEventListener, QueueLoop, Wait, file as nfile } from '..'
 import { SFUSignal } from './signal'
 import { getHash } from '../file'
 const CryptoJS = require('crypto-js')
@@ -560,7 +553,7 @@ export class SFUClient extends EventTarget {
     Object.keys(this.streams).forEach((id) => {
       this.unpublish(id)
     })
-    this.d.increase(() => { }, 100)
+    this.d.increase(() => {}, 100)
     this.c.leave()
     this.queueLoop.decreaseAll()
   }
@@ -578,7 +571,7 @@ export class SFUClient extends EventTarget {
   public setUserInfo(userInfo: { [k: string]: any }) {
     this.clientInfo.userInfo = userInfo
   }
-  public getClientId() { }
+  public getClientId() {}
   public DataChannelAPI() {
     const send = (
       eventName: string,
@@ -1257,7 +1250,7 @@ export class SFUClient extends EventTarget {
             this.requests[data.clientInfo.clientId] &&
             this.requests[data.clientInfo.clientId][data.eventName] &&
             this.requests[data.clientInfo.clientId][data.eventName][
-            data?.requestId
+              data?.requestId
             ] &&
             this.requests[data.clientInfo.clientId][data.eventName][
               data?.requestId

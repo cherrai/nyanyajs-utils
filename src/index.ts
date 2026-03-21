@@ -21,7 +21,6 @@ import {
   RSA,
   AES,
 } from './cipher'
-import { SAaSS } from './saass'
 import { SakiSSOClient } from './sakisso'
 import {
   deepCopy,
@@ -56,7 +55,6 @@ export {
   // SFUClient,
   // SFUSignal,
   // SFUStream,
-  SAaSS,
   deepCopy,
   NRequest,
   SakiSSOClient,
@@ -98,7 +96,6 @@ export default {
   // SFUClient,
   // SFUSignal,
   // SFUStream,
-  SAaSS,
   deepCopy,
   NRequest,
   SakiSSOClient,
