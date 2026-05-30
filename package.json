@@ -8,7 +8,6 @@
     "cpWasmJS": "cp -r ./src/webAssembly/dist/ ./dist/webAssembly",
     "build": "yarn cpWasmJS && tsc",
     "dev": "tsc --watch",
-    "prepare": "npm run build",
     "pub": "npm publish --registry https://registry.npm.aiiko.club",
     "unpub": "npm unpublish @nyanyajs/utils@1.0.32 --registry https://registry.npm.aiiko.club"
   },
