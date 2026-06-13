@@ -3,6 +3,9 @@ import { NyaNyaDB, IndexedDB } from '@nyanyajs/nyanyadb'
 import md5 from 'blueimp-md5'
 // import QueueLoop from '../queueloop'
 import { AsyncQueue } from '../asyncQueue'
+import { AsyncWait } from '../asyncWait/asyncWait'
+import { Wait } from '../common/wait'
+import { Mutex, MutexManager } from '../mutex'
 // import { AsyncQueue } from '@nyanyajs/utils'
 
 export interface StorageOptions {
@@ -835,6 +838,7 @@ export class WebStorage<K = string, T = any> {
   public encryption: StorageOptions['encryption'] = {
     enable: false,
   }
+  private mutexManager = new MutexManager()
   public baseLabel: string = ''
   public label: string = ''
   public map: {
@@ -1202,19 +1206,39 @@ export class WebStorage<K = string, T = any> {
     return undefined
   }
   public async get(key: K) {
-    return this.strategy.get(key, this)
+    const unlock = await this.mutexManager.acquire(String(key))
+    try {
+      return await this.strategy.get(key, this)
+    } finally {
+      unlock()
+    }
   }
   public getSync(key: K): T {
     return this.strategy.getSync(key, this)
   }
   public async getAndSet(key: K, func: (value: T) => Promise<T>) {
-    return this.strategy.getAndSet(key, func, this)
+    const unlock = await this.mutexManager.acquire(String(key))
+    try {
+      return this.strategy.getAndSet(key, func, this)
+    } finally {
+      unlock()
+    }
   }
   public async mget(keys: K[]) {
-    return this.strategy.mget(keys, this)
+    const unlock = await this.mutexManager.acquire(md5(JSON.stringify(keys)))
+    try {
+      return this.strategy.mget(keys, this)
+    } finally {
+      unlock()
+    }
   }
   public async getAll() {
-    return this.strategy.getAll(this)
+    const unlock = await this.mutexManager.acquire('getAll')
+    try {
+      return this.strategy.getAll(this)
+    } finally {
+      unlock()
+    }
   }
   public getAllSync(): {
     key: K
@@ -1223,8 +1247,13 @@ export class WebStorage<K = string, T = any> {
     return this.strategy.getAllSync(this)
   }
   // expiration(s)
-  public set(key: K, value: T, expiration: number = 0) {
-    return this.strategy.set(key, value, expiration, this)
+  public async set(key: K, value: T, expiration: number = 0) {
+    const unlock = await this.mutexManager.acquire(String(key))
+    try {
+      return this.strategy.set(key, value, expiration, this)
+    } finally {
+      unlock()
+    }
   }
   public async mset(
     params: {
@@ -1233,16 +1262,33 @@ export class WebStorage<K = string, T = any> {
       expiration: number
     }[]
   ) {
-    return this.strategy.mset(params, this)
+    const unlock = await this.mutexManager.acquire(
+      md5(JSON.stringify(params.map((p) => p.key)))
+    )
+    try {
+      return this.strategy.mset(params, this)
+    } finally {
+      unlock()
+    }
   }
   public setSync(key: K, value: T, expiration: number = 0): boolean {
     return this.strategy.setSync(key, value, expiration, this)
   }
   public async delete(key: K) {
-    return this.strategy.delete(key, this)
+    const unlock = await this.mutexManager.acquire(String(key))
+    try {
+      return this.strategy.delete(key, this)
+    } finally {
+      unlock()
+    }
   }
   public async mdelete(keys: K[]) {
-    return this.strategy.mdelete(keys, this)
+    const unlock = await this.mutexManager.acquire(md5(JSON.stringify(keys)))
+    try {
+      return this.strategy.mdelete(keys, this)
+    } finally {
+      unlock()
+    }
   }
   public deleteAll() {
     return this.strategy.deleteAll(this)

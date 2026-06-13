@@ -27,7 +27,12 @@ export class NEventListener<T extends Record<string | symbol, any>> {
       key?: string
     }
   ) {
-    if (!func) return () => {}
+    if (!func)
+      return {
+        off: () => {
+          this.off(event, func)
+        },
+      }
 
     const item: ListenerItem = {
       func,

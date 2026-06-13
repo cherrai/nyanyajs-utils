@@ -3,11 +3,12 @@ export class Wait {
     [k: string]: {
       fl: (() => void)[]
       status: number
+      timeoutIds?: NodeJS.Timeout[] // 超时定时器
     }
   } = {}
-  async waiting(key: string = 'wait') {
+  async waiting(key: string = 'wait', timeout?: number) {
     // this.revoke(key)
-    return new Promise((res) => {
+    return new Promise((res, rej) => {
       !this.handlers[key] &&
         (this.handlers[key] = {
           status: 0,
@@ -20,6 +21,18 @@ export class Wait {
       this.handlers[key].fl.push(() => {
         res(undefined)
       })
+
+      // 设置超时
+      if (timeout) {
+        const timeoutId = setTimeout(() => {
+          // 从队列中移除自己
+          const index = this.handlers[key].fl.indexOf(res as any)
+          if (index !== -1) this.handlers[key].fl.splice(index, 1)
+          rej(new Error(`Wait timeout for "${key}" after ${timeout}ms`))
+        }, timeout)
+
+        this.handlers[key].timeoutIds?.push(timeoutId)
+      }
     })
   }
   dispatch(key: string = 'wait') {
@@ -29,8 +42,8 @@ export class Wait {
         fl: [],
       })
     this.handlers[key].status = 1
-    this.handlers[key].fl.forEach((v) => {
-      v()
+    this.handlers[key].fl.forEach((res) => {
+      res()
     })
     this.handlers[key].fl = []
   }

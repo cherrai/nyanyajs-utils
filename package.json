@@ -1,6 +1,6 @@
 {
   "name": "@nyanyajs/utils",
-  "version": "1.0.43",
+  "version": "1.0.45",
   "description": "nyanyajs/utils",
   "main": "./dist/index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "yarn cpWasmJS && tsc",
     "dev": "tsc --watch",
     "pub": "npm publish --registry https://registry.npm.aiiko.club",
-    "unpub": "npm unpublish @nyanyajs/utils@1.0.32 --registry https://registry.npm.aiiko.club"
+    "unpub": "npm unpublish @nyanyajs/utils@1.0.44 --registry https://registry.npm.aiiko.club"
   },
   "author": "shiina_aiiko",
   "repository": {

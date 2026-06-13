@@ -8,7 +8,7 @@ export class AsyncWait {
   waiting(key: string) {
     return new Promise((resolve, reject) => {
       try {
-        console.log('waitingwaiting', this.handlers[key]?.length)
+        // console.log('waitingwaiting', this.handlers[key]?.length)
         if (!this.handlers[key]) {
           this.handlers[key] = []
         }
@@ -26,19 +26,15 @@ export class AsyncWait {
   }
 
   resolve(key: string) {
-    console.log('waitingwaiting11111', this.handlers[key]?.length)
+    // console.log('waitingwaiting11111', this.handlers[key]?.length)
 
     if (!this.handlers[key]?.length) {
       return
     }
     const f = this.handlers[key].shift()
 
-    f()
+    f && f()
   }
-
-
-
-
 
   // private handlers: {
   // 	[s: string]: F[][]
